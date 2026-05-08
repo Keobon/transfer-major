@@ -2,3 +2,6 @@
 .netlify
 .env
 .env.local
+
+node_modules
+netlify/functions/node_modules/
