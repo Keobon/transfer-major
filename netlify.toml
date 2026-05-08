@@ -1,0 +1,27 @@
+[build]
+  base    = "frontend"
+  command = "npm run build"
+  publish = "dist"
+
+[functions]
+  directory = "netlify/functions"
+
+[functions."major-gap-analysis"]
+  timeout = 26
+
+[functions."recommend-majors"]
+  timeout = 26
+
+[functions."parse-pdf"]
+  timeout = 20
+
+[dev]
+  command    = "npm run dev --prefix frontend"
+  targetPort = 5173
+  port       = 8888
+  framework  = "#custom"
+
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
