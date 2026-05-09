@@ -13,15 +13,12 @@
 const https = require('https');
 
 // ─────────────────────────────────────────────
-// API 키 상수 (공식 매뉴얼 기반)
+// API 키 상수
 // ─────────────────────────────────────────────
-const KEY_CAREERNET = '488782036227e15faccd08091610c2c9'; // 커리어넷 (학과+직업 공통)
-const KEY_WORKNET = 'fc086189-feb3-4055-8430-4f2f3f1d2451'; // 워크넷(고용24) 채용정보
-const KEY_HRD = '1e50a1f6-8a53-4074-b61d-6bdc6e91afc4'; // HRD-Net 훈련과정
+const KEY_CAREERNET = '488782036227e15faccd08091610c2c9';
+const KEY_WORKNET = 'fc086189-feb3-4055-8430-4f2f3f1d2451';
+const KEY_HRD = '1e50a1f6-8a53-4074-b61d-6bdc6e91afc4';
 
-// ─────────────────────────────────────────────
-// CORS 헤더
-// ─────────────────────────────────────────────
 const HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type',
@@ -64,9 +61,9 @@ function httpsPost(hostname, path, reqHeaders, body) {
         },
       },
       (res) => {
-        let data = '';
-        res.on('data', (c) => (data += c));
-        res.on('end', () => resolve(data));
+        const chunks = [];
+        res.on('data', (c) => chunks.push(c));
+        res.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
         res.on('error', reject);
       },
     );
@@ -93,8 +90,6 @@ function safeJson(text) {
 
 // ─────────────────────────────────────────────
 // 1. 커리어넷 학과 상세정보
-//    GET https://www.career.go.kr/cnet/openapi/getOpenApi
-//    svcCode=MAJOR_VIEW, gubun=univ_list, majorSeq=학과코드
 // ─────────────────────────────────────────────
 async function fetchCareernetMajorDetail(majorSeq) {
   if (!majorSeq) return null;
@@ -108,10 +103,8 @@ async function fetchCareernetMajorDetail(majorSeq) {
     const item = parsed?.dataSearch?.content?.[0];
     if (!item) return null;
 
-    // HTML 태그 제거 함수
+    // HTML 태그 제거
     const stripHtml = (str) => (str || '').replace(/<[^>]*>/g, '').trim();
-
-    // 모든 필드에서 HTML 태그 제거
     return {
       ...item,
       employment: stripHtml(item.employment),
@@ -128,18 +121,10 @@ async function fetchCareernetMajorDetail(majorSeq) {
 }
 
 // ─────────────────────────────────────────────
-// 2. 커리어넷 직업백과 목록 검색
-//    GET https://www.career.go.kr/cnet/front/openapi/jobs.json
-//    파라미터: apiKey, searchJobNm(검색어), pageIndex
-// ─────────────────────────────────────────────
-// ─────────────────────────────────────────────
 // 2. 커리어넷 직업백과 검색
-//    학과명이 아닌 직업 키워드로 검색해야 결과가 나옴
-//    예: "그래픽디자인학과" → "디자이너" / "문예창작" → "작가"
 // ─────────────────────────────────────────────
 async function fetchCareernetJobs(keyword) {
   try {
-    // 학과명에서 직업 키워드로 변환
     const jobKeyword = convertMajorToJobKeyword(keyword);
     const enc = encodeURIComponent(jobKeyword);
     const url =
@@ -151,7 +136,6 @@ async function fetchCareernetJobs(keyword) {
     const jobs = parsed?.jobs || [];
     console.log('커리어넷 직업 결과:', jobs.length, '건');
 
-    // 결과 없으면 빈 키워드로 재시도 (전체 목록 일부)
     if (jobs.length === 0) {
       console.log('직업 검색 결과 없음 — 키워드 단순화 재시도');
       const short = jobKeyword.slice(0, 2);
@@ -163,7 +147,6 @@ async function fetchCareernetJobs(keyword) {
       console.log('재시도 결과:', jobs2.length, '건');
       return jobs2.slice(0, 6).map(mapJob);
     }
-
     return jobs.slice(0, 6).map(mapJob);
   } catch (e) {
     console.warn('커리어넷 직업 검색 실패:', e.message);
@@ -171,7 +154,6 @@ async function fetchCareernetJobs(keyword) {
   }
 }
 
-// 직업 객체 매핑
 function mapJob(j) {
   return {
     seq: j.seq,
@@ -182,10 +164,8 @@ function mapJob(j) {
   };
 }
 
-// 학과명 → 직업 키워드 변환 테이블
 function convertMajorToJobKeyword(major) {
   const m = (major || '').replace(/학과|학부|전공|대학|계열/g, '').trim();
-
   const table = [
     [/(그래픽|시각|영상|미디어)디자인/, '디자이너'],
     [/(UI|UX|웹|앱|모바일)/, '디자이너'],
@@ -210,20 +190,19 @@ function convertMajorToJobKeyword(major) {
     [/(환경|생태)/, '환경'],
     [/(식품|영양)/, '영양사'],
     [/(패션|의류|섬유)/, '패션디자이너'],
+    [/(문헌|도서관|사서)/, '사서'],
+    [/(문화|인류|민속)/, '문화기획'],
+    [/(행정|정책|공공)/, '행정'],
+    [/(철학|역사|고고)/, '연구원'],
   ];
-
   for (const [pattern, keyword] of table) {
     if (pattern.test(m)) return keyword;
   }
-
-  // 매핑 없으면 앞 2글자로 검색
   return m.slice(0, 2) || m;
 }
 
 // ─────────────────────────────────────────────
 // 3. 워크넷(고용24) 채용정보
-//    GET https://www.work24.go.kr/cm/openApi/call/wk/callOpenApiSvcInfo210L01.do
-//    파라미터: authKey, callTp=L, returnType=JSON, startPage, display, keyword
 // ─────────────────────────────────────────────
 async function fetchWorknetRecruitment(keyword) {
   try {
@@ -235,12 +214,9 @@ async function fetchWorknetRecruitment(keyword) {
     console.log('워크넷 채용 검색 키워드:', keyword);
     const text = await httpsGet(url);
     const parsed = safeJson(text);
-
-    // 워크넷 응답 구조: wantedRoot > wanted 배열
     const list = parsed?.wantedRoot?.wanted || [];
     const arr = Array.isArray(list) ? list : [list];
     console.log('워크넷 채용 결과:', arr.length, '건');
-
     return arr
       .filter(Boolean)
       .slice(0, 5)
@@ -261,17 +237,9 @@ async function fetchWorknetRecruitment(keyword) {
 
 // ─────────────────────────────────────────────
 // 4. HRD-Net 국민내일배움카드 훈련과정
-//    GET https://www.work24.go.kr/cm/openApi/call/hr/callOpenApiSvcInfo310L01.do
-//    파라미터: authKey, returnType=JSON, outType=1, pageNum, pageSize,
-//              srchTraStDt, srchTraEndDt, sort, sortCol,
-//              crseTracseSe=C0061(국민내일배움카드),
-//              srchTraProcessNm(훈련과정명 키워드)
 // ─────────────────────────────────────────────
 async function fetchHrdTraining(keyword) {
   try {
-    const enc = encodeURIComponent(keyword || '');
-
-    // 오늘~6개월 후 날짜 계산
     const now = new Date();
     const pad = (n) => String(n).padStart(2, '0');
     const fmt = (d) =>
@@ -279,52 +247,44 @@ async function fetchHrdTraining(keyword) {
     const end = new Date(now);
     end.setMonth(end.getMonth() + 6);
 
-    // 1차 시도: 훈련과정명 키워드 검색
-    const url =
+    const buildUrl = (kw) =>
       `https://www.work24.go.kr/cm/openApi/call/hr/callOpenApiSvcInfo310L01.do` +
       `?authKey=${KEY_HRD}&returnType=JSON&outType=1` +
       `&pageNum=1&pageSize=10` +
       `&srchTraStDt=${fmt(now)}&srchTraEndDt=${fmt(end)}` +
       `&crseTracseSe=C0061` +
-      `&srchTraProcessNm=${enc}` +
+      `&srchTraProcessNm=${encodeURIComponent(kw)}` +
       `&sort=DESC&sortCol=2`;
 
-    console.log('HRD-Net URL:', url);
-    const text = await httpsGet(url);
-    const parsed = safeJson(text);
-    console.log('HRD-Net 응답 앞 200자:', text.slice(0, 200));
-
-    let list =
-      parsed?.HRDNet?.srchList?.scn_list ||
-      parsed?.srchList?.scn_list ||
-      parsed?.srchList ||
-      [];
-
-    // 결과 없으면 키워드 2글자로 재시도
-    if (!Array.isArray(list) || list.length === 0) {
-      console.log('HRD-Net 결과 없음, 키워드 축소 재시도');
-      const short = encodeURIComponent(keyword.slice(0, 2));
-      const url2 =
-        `https://www.work24.go.kr/cm/openApi/call/hr/callOpenApiSvcInfo310L01.do` +
-        `?authKey=${KEY_HRD}&returnType=JSON&outType=1` +
-        `&pageNum=1&pageSize=10` +
-        `&srchTraStDt=${fmt(now)}&srchTraEndDt=${fmt(end)}` +
-        `&crseTracseSe=C0061` +
-        `&srchTraProcessNm=${short}` +
-        `&sort=DESC&sortCol=2`;
-      const text2 = await httpsGet(url2);
-      const parsed2 = safeJson(text2);
-      list =
-        parsed2?.HRDNet?.srchList?.scn_list ||
-        parsed2?.srchList?.scn_list ||
-        parsed2?.srchList ||
+    // 응답에서 리스트 추출 — 다중 구조 대응
+    // 실제 확인된 구조: { srchList: [...], scn_cnt: N }
+    const extractList = (text) => {
+      const parsed = safeJson(text);
+      if (!parsed) return [];
+      const raw =
+        parsed?.HRDNet?.srchList?.scn_list || // 구조 1
+        parsed?.srchList?.scn_list || // 구조 2
+        parsed?.srchList || // 구조 3 (실제 확인)
         [];
+      return Array.isArray(raw) ? raw : [];
+    };
+
+    console.log('HRD-Net 검색 키워드:', keyword);
+    const text1 = await httpsGet(buildUrl(keyword));
+    console.log('HRD-Net 응답 앞 150자:', text1.slice(0, 150));
+    let list = extractList(text1);
+
+    // 결과 없으면 앞 2글자로 재시도
+    if (list.length === 0) {
+      const short = keyword.slice(0, 2);
+      console.log('HRD-Net 재시도 키워드:', short);
+      const text2 = await httpsGet(buildUrl(short));
+      list = extractList(text2);
     }
 
-    const arr = Array.isArray(list) ? list : [list];
-    console.log('HRD-Net 최종 결과:', arr.length, '건');
+    console.log('HRD-Net 최종 결과:', list.length, '건');
 
-    return arr
+    return list
       .filter(Boolean)
       .slice(0, 5)
       .map((item) => ({
@@ -375,19 +335,14 @@ ${majorInfo ? `학과정보: ${majorInfo}` : ''}
 - transferRoutes desc: 각 방법의 구체적 준비절차·심사기준·주의사항 3문장.
 - certifications: 실제 존재하는 국가공인 자격증 5개만.
 
-{"totalScore":72,"grade":"준비 필요","summary":"2문장 핵심분석",
+{"totalScore":실제계산값(0~100),"grade":"점수에맞는등급","summary":"2문장 핵심분석",
 "skillRadar":[{"name":"수리/논리","current":60,"required":70},{"name":"글쓰기/표현","current":50,"required":65},{"name":"창의적사고","current":55,"required":70},{"name":"전공기초지식","current":40,"required":75},{"name":"커뮤니케이션","current":70,"required":60},{"name":"실기/실무","current":20,"required":80}],
 "strongPoints":[{"skill":"역량명","percent":70,"reason":"2문장"}],
 "weakPoints":[{"skill":"역량명","current":20,"required":80,"reason":"2문장"}],
-// prompt 안의 transferRoutes 정의 부분 교체
-"transferRoutes":[
-  {"type":"편입","duration":"1년 6개월","difficulty":"높음","desc":"3문장"},
-  {"type":"전과","duration":"1학기~1년","difficulty":"보통","desc":"3문장"},
-  {"type":"복수전공","duration":"2년","difficulty":"낮음","desc":"3문장"}
-]
+"transferRoutes":[{"type":"편입","duration":"1년 6개월","difficulty":"높음","desc":"3문장"},{"type":"전과","duration":"1학기~1년","difficulty":"보통","desc":"3문장"},{"type":"복수전공","duration":"2년","difficulty":"낮음","desc":"3문장"}],
 "certifications":["자격증1","자격증2","자격증3","자격증4","자격증5"]}`;
 
-  console.log('GPT 요청 시작...');
+  console.log('GPT 갭분석 요청 시작...');
   const gptResponseText = await httpsPost(
     'api.openai.com',
     '/v1/chat/completions',
@@ -403,52 +358,6 @@ ${majorInfo ? `학과정보: ${majorInfo}` : ''}
     },
   );
 
-  // ─────────────────────────────────────────────
-  // 6. GPT로 관련 공모전 정보 생성
-  //    실제로 정기 개최되는 분야별 공모전 정보 반환
-  // ─────────────────────────────────────────────
-  async function generateContests(targetMajorName) {
-    const openaiKey = process.env.OPENAI_API_KEY;
-    if (!openaiKey) return [];
-
-    const keyword = targetMajorName
-      .replace(/학과|학부|전공|대학|계열/g, '')
-      .trim();
-
-    const prompt = `${targetMajorName} 전공 관련 대학생이 참가할 수 있는 실제 공모전 4개를 알려줘.
-실제로 매년 정기적으로 개최되는 공모전만 포함. 없는 공모전 만들지 말 것.
-주최기관과 공모전명은 실제여야 함.
-
-JSON만 반환:
-{"contests":[
-  {"name":"공모전명","organizer":"주최기관","category":"분야(예:디자인/아이디어/논문/영상)","period":"접수시기(예:매년 3~4월)","benefit":"혜택(상금/수상경력/취업연계 등)","tip":"준비 팁 1문장"}
-]}`;
-
-    try {
-      const gptRes = await httpsPost(
-        'api.openai.com',
-        '/v1/chat/completions',
-        {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${openaiKey}`,
-        },
-        {
-          model: 'gpt-4o-mini',
-          messages: [{ role: 'user', content: prompt }],
-          temperature: 0.3,
-          max_tokens: 600,
-        },
-      );
-      const gptData = safeJson(gptRes);
-      const raw = gptData?.choices?.[0]?.message?.content || '';
-      const parsed = safeJson(raw.replace(/```json|```/g, '').trim());
-      return parsed?.contests || [];
-    } catch (e) {
-      console.warn('공모전 생성 실패:', e.message);
-      return [];
-    }
-  }
-
   const gptData = safeJson(gptResponseText);
   if (!gptData) throw new Error('GPT 응답 파싱 실패');
   if (gptData.error) throw new Error('GPT 오류: ' + gptData.error.message);
@@ -462,6 +371,54 @@ JSON만 반환:
     const match = rawText.match(/\{[\s\S]*\}/);
     if (!match) throw new Error('JSON 파싱 실패: ' + rawText.slice(0, 200));
     return JSON.parse(match[0]);
+  }
+}
+
+// ─────────────────────────────────────────────
+// 6. GPT로 관련 공모전 정보 생성
+//    generateGapAnalysis 바깥, 최상위 스코프에 선언
+// ─────────────────────────────────────────────
+async function generateContests(targetMajorName) {
+  const openaiKey = process.env.OPENAI_API_KEY;
+  if (!openaiKey) return [];
+
+  const keyword = (targetMajorName || '')
+    .replace(/학과|학부|전공|대학|계열/g, '')
+    .trim();
+
+  const prompt = `${targetMajorName} 전공 관련 대학생이 참가할 수 있는 실제 공모전 4개를 알려줘.
+실제로 매년 정기적으로 개최되는 공모전만 포함. 없는 공모전 만들지 말 것.
+주최기관과 공모전명은 실제여야 함.
+
+JSON만 반환(마크다운 없이):
+{"contests":[
+  {"name":"공모전명","organizer":"주최기관","category":"분야(예:디자인/아이디어/논문/영상)","period":"접수시기(예:매년 3~4월)","benefit":"혜택(상금/수상경력/취업연계 등)","tip":"준비 팁 1문장"}
+]}`;
+
+  try {
+    const gptRes = await httpsPost(
+      'api.openai.com',
+      '/v1/chat/completions',
+      {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${openaiKey}`,
+      },
+      {
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.3,
+        max_tokens: 600,
+      },
+    );
+    const gptData = safeJson(gptRes);
+    const raw = gptData?.choices?.[0]?.message?.content || '';
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const parsed = safeJson(clean);
+    console.log('공모전 생성 완료:', parsed?.contests?.length, '개');
+    return parsed?.contests || [];
+  } catch (e) {
+    console.warn('공모전 생성 실패:', e.message);
+    return [];
   }
 }
 
@@ -500,19 +457,17 @@ exports.handler = async (event) => {
       fetchCareernetJobs(keyword),
     ]);
 
-    // 2차 병렬 조회에 contests 추가
+    // 2차 병렬: 워크넷 채용 + HRD-Net 훈련 + 공모전
     const [recruitList, trainingList, contests] = await Promise.all([
       fetchWorknetRecruitment(keyword),
       fetchHrdTraining(keyword),
-      generateContests(targetMajorName), // 추가
+      generateContests(targetMajorName),
     ]);
-
-    // 응답에 contests 포함
-    analysis.contests = contests;
 
     console.log(
       `데이터 조회 완료 - 학과:${majorDetail ? 'Y' : 'N'} ` +
-        `직업:${relatedJobs.length} 채용:${recruitList.length} 훈련:${trainingList.length}`,
+        `직업:${relatedJobs.length} 채용:${recruitList.length} ` +
+        `훈련:${trainingList.length} 공모전:${contests.length}`,
     );
 
     // GPT 갭분석
@@ -535,6 +490,7 @@ exports.handler = async (event) => {
           .join(' / ')
       : `학과명: ${targetMajorName}`;
 
+    // generateGapAnalysis 호출 후 analysis에 나머지 데이터 주입
     const analysis = await generateGapAnalysis({
       currentMajor,
       targetMajorName,
@@ -564,6 +520,7 @@ exports.handler = async (event) => {
     analysis.relatedJobs = relatedJobs;
     analysis.recruitList = recruitList;
     analysis.trainingList = trainingList;
+    analysis.contests = contests; // ← 올바른 위치
 
     console.log('갭분석 완료 totalScore:', analysis.totalScore);
 
