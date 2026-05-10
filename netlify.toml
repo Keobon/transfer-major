@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build --prefix frontend"
+  command = "npm run build --prefix frontend && npm install --prefix netlify/functions"
   publish = "frontend/dist"
 
 [functions]
@@ -28,3 +28,6 @@
   from   = "/*"
   to     = "/index.html"
   status = 200
+
+[[plugins]]
+  package = "@netlify/plugin-functions-install-core"
