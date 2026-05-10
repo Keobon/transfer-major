@@ -1,13 +1,18 @@
-/* ── 환승전공 글로벌 스타일 ────────────────────── */
+/* ── 내일환승 글로벌 스타일 — 머스타드 뮤트 테마 ── */
 :root {
-  --green: #1a3a2f;
-  --green-mid: #2d5a45;
-  --cream: #f5f2ec;
-  --gold: #b8975a;
-  --border: #e0dad0;
-  --text: #1a1a1a;
-  --text-sub: #5c5c5c;
-  --bg: #f5f2ec;
+  --bg: #f7f3e8;
+  --surface: #fefcf5;
+  --green: #2c4a3e;
+  --green-mid: #3d6b5a;
+  --mustard: #d4a837;
+  --mustard-lt: #e8b84b;
+  --mustard-bg: #fff8e1;
+  --gold: #c4973a;
+  --cream: #faf6ec;
+  --border: #e8dfc8;
+  --text: #1c1c1a;
+  --text-sub: #5a5548;
+  --text-muted: #9a9080;
 
   font:
     16px/150% 'Pretendard',
@@ -50,49 +55,42 @@ h4 {
   color: var(--text);
   margin: 0;
 }
-
 p {
   margin: 0;
 }
-
 a {
   color: var(--green);
   text-decoration: none;
 }
-
 button {
   font-family: inherit;
 }
-
 input,
 textarea,
 select {
   font-family: inherit;
 }
 
-/* 스크롤바 */
 ::-webkit-scrollbar {
   width: 4px;
   height: 4px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--cream);
+  background: var(--bg);
 }
 ::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #c8c0b0;
+  background: #d0c5a8;
 }
 
-/* 선택 */
 ::selection {
-  background: #1a3a2f20;
-  color: var(--green);
+  background: #d4a83722;
+  color: var(--mustard);
 }
 
-/* 모바일 탭 스크롤 숨김 */
 .tab-scroll::-webkit-scrollbar {
   display: none;
 }

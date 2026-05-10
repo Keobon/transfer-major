@@ -1,15 +1,20 @@
 import { useState } from 'react';
 import { supabase } from '../supabase';
 
-// ── 디자인 토큰 ─────────────────────────────────
 const C = {
-  green: '#1A3A2F',
-  greenMid: '#2D5A45',
-  cream: '#F5F2EC',
-  gold: '#B8975A',
-  border: '#E0DAD0',
-  text: '#1A1A1A',
-  textSub: '#5C5C5C',
+  bg: '#F7F3E8',
+  surface: '#FEFCF5',
+  green: '#2C4A3E',
+  greenMid: '#3D6B5A',
+  gold: '#C4973A',
+  goldLt: '#E8B84B',
+  mustard: '#D4A837',
+  mustardBg: '#FFF8E1',
+  cream: '#FAF6EC',
+  border: '#E8DFC8',
+  text: '#1C1C1A',
+  textSub: '#5A5548',
+  textMuted: '#9A9080',
   danger: '#8B3A3A',
 };
 
@@ -19,7 +24,6 @@ export default function LoginPage({ onSwitch }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // ── 로직 원본 유지 ──────────────────────────────
   const handleLogin = async () => {
     setLoading(true);
     setError('');
@@ -35,19 +39,19 @@ export default function LoginPage({ onSwitch }) {
     <div
       style={{
         minHeight: '100vh',
-        background: C.cream,
+        background: C.bg,
         display: 'flex',
         fontFamily: "'Pretendard','Apple SD Gothic Neo',sans-serif",
       }}
     >
       <style>{`
-        @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
         * { box-sizing: border-box; }
-        input::placeholder { color: #B0ABA4; }
-        input:focus { outline: none; border-color: #1A3A2F !important; box-shadow: 0 0 0 3px #1A3A2F18; }
+        input::placeholder { color: #C0B89A; }
+        input:focus { outline: none; border-color: ${C.green} !important; box-shadow: 0 0 0 3px ${C.green}18; }
       `}</style>
 
-      {/* 왼쪽 — 그린 패널 */}
+      {/* 왼쪽 — 딥 그린 패널 */}
       <div
         style={{
           width: '42%',
@@ -60,13 +64,12 @@ export default function LoginPage({ onSwitch }) {
           padding: '48px 40px',
         }}
       >
-        {/* 토포그래픽 패턴 */}
         <div
           style={{
             position: 'absolute',
             inset: 0,
-            backgroundImage: `repeating-conic-gradient(${C.greenMid}10 0% 25%, transparent 0% 50%)`,
-            backgroundSize: '32px 32px',
+            backgroundImage: `repeating-conic-gradient(${C.greenMid}18 0% 25%, transparent 0% 50%)`,
+            backgroundSize: '28px 28px',
             pointerEvents: 'none',
           }}
         />
@@ -74,7 +77,19 @@ export default function LoginPage({ onSwitch }) {
           style={{
             position: 'absolute',
             inset: 0,
-            backgroundImage: `radial-gradient(ellipse 80% 70% at 50% 110%, ${C.greenMid}80 0%, transparent 60%)`,
+            backgroundImage: `radial-gradient(ellipse 80% 70% at 50% 110%, ${C.greenMid}90 0%, transparent 60%)`,
+            pointerEvents: 'none',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            top: -60,
+            right: -60,
+            width: 200,
+            height: 200,
+            borderRadius: '50%',
+            background: `${C.mustard}12`,
             pointerEvents: 'none',
           }}
         />
@@ -103,7 +118,7 @@ export default function LoginPage({ onSwitch }) {
               style={{
                 fontSize: 22,
                 fontWeight: 300,
-                color: C.gold,
+                color: C.goldLt,
                 letterSpacing: '0.12em',
               }}
             >
@@ -112,9 +127,9 @@ export default function LoginPage({ onSwitch }) {
           </div>
           <p
             style={{
-              fontSize: 10,
-              color: `${C.cream}70`,
-              letterSpacing: '0.04em',
+              fontSize: 11,
+              color: `${C.cream}65`,
+              letterSpacing: '0.03em',
               margin: 0,
             }}
           >
@@ -122,25 +137,27 @@ export default function LoginPage({ onSwitch }) {
           </p>
         </div>
 
-        {/* 중앙 카피 */}
+        {/* 히어로 카피 */}
         <div style={{ position: 'relative' }}>
           <p
             style={{
-              fontSize: 10,
-              color: `${C.cream}50`,
+              fontSize: 9,
+              color: C.goldLt,
+              fontWeight: 700,
               letterSpacing: '0.2em',
               textTransform: 'uppercase',
               margin: '0 0 16px',
+              opacity: 0.9,
             }}
           >
-            내일환승 — 전공 갭 분석
+            Major Transfer Analysis
           </p>
           <h1
             style={{
-              fontSize: 32,
+              fontSize: 30,
               fontWeight: 800,
               color: C.cream,
-              lineHeight: 1.2,
+              lineHeight: 1.25,
               margin: '0 0 16px',
               letterSpacing: '-0.02em',
             }}
@@ -152,8 +169,8 @@ export default function LoginPage({ onSwitch }) {
           <p
             style={{
               fontSize: 13,
-              color: `${C.cream}70`,
-              lineHeight: 1.8,
+              color: `${C.cream}65`,
+              lineHeight: 1.85,
               margin: 0,
             }}
           >
@@ -166,7 +183,7 @@ export default function LoginPage({ onSwitch }) {
         </div>
 
         {/* 하단 데이터 배지 */}
-        <div style={{ position: 'relative', display: 'flex', gap: 16 }}>
+        <div style={{ position: 'relative', display: 'flex', gap: 10 }}>
           {[
             { label: '학과 DB', value: '3,800+' },
             { label: '채용공고', value: '실시간' },
@@ -176,9 +193,9 @@ export default function LoginPage({ onSwitch }) {
               key={item.label}
               style={{
                 flex: 1,
-                padding: '10px 12px',
-                background: `${C.cream}08`,
-                border: `1px solid ${C.cream}15`,
+                padding: '10px 10px',
+                background: `${C.mustard}12`,
+                border: `1px solid ${C.goldLt}18`,
                 borderRadius: 8,
               }}
             >
@@ -186,7 +203,7 @@ export default function LoginPage({ onSwitch }) {
                 style={{
                   fontSize: 14,
                   fontWeight: 700,
-                  color: C.gold,
+                  color: C.goldLt,
                   margin: '0 0 2px',
                 }}
               >
@@ -196,7 +213,7 @@ export default function LoginPage({ onSwitch }) {
                 style={{
                   fontSize: 9,
                   color: `${C.cream}50`,
-                  letterSpacing: '0.1em',
+                  letterSpacing: '0.08em',
                   textTransform: 'uppercase',
                   margin: 0,
                 }}
@@ -216,6 +233,7 @@ export default function LoginPage({ onSwitch }) {
           alignItems: 'center',
           justifyContent: 'center',
           padding: '48px 40px',
+          background: C.bg,
         }}
       >
         <div
@@ -228,7 +246,7 @@ export default function LoginPage({ onSwitch }) {
           <p
             style={{
               fontSize: 10,
-              color: C.gold,
+              color: C.mustard,
               fontWeight: 700,
               letterSpacing: '0.2em',
               textTransform: 'uppercase',
@@ -252,7 +270,7 @@ export default function LoginPage({ onSwitch }) {
             style={{
               fontSize: 13,
               color: C.textSub,
-              margin: '0 0 36px',
+              margin: '0 0 32px',
               lineHeight: 1.6,
             }}
           >
@@ -282,12 +300,11 @@ export default function LoginPage({ onSwitch }) {
                 display: 'block',
                 width: '100%',
                 padding: '13px 16px',
-                border: `1px solid ${C.border}`,
+                border: `1.5px solid ${C.border}`,
                 borderRadius: 8,
                 fontSize: 14,
                 color: C.text,
-                background: '#FAFAF8',
-                transition: 'border-color 0.15s, box-shadow 0.15s',
+                background: C.surface,
               }}
             />
           </div>
@@ -315,12 +332,11 @@ export default function LoginPage({ onSwitch }) {
                 display: 'block',
                 width: '100%',
                 padding: '13px 16px',
-                border: `1px solid ${C.border}`,
+                border: `1.5px solid ${C.border}`,
                 borderRadius: 8,
                 fontSize: 14,
                 color: C.text,
-                background: '#FAFAF8',
-                transition: 'border-color 0.15s, box-shadow 0.15s',
+                background: C.surface,
               }}
             />
           </div>
@@ -332,7 +348,7 @@ export default function LoginPage({ onSwitch }) {
                 background: `${C.danger}10`,
                 border: `1px solid ${C.danger}30`,
                 borderRadius: 8,
-                marginBottom: 16,
+                marginBottom: 14,
               }}
             >
               <p style={{ color: C.danger, fontSize: 12, margin: 0 }}>
@@ -348,16 +364,17 @@ export default function LoginPage({ onSwitch }) {
               width: '100%',
               padding: '14px 0',
               borderRadius: 8,
-              background: loading ? C.greenMid : C.green,
+              background: C.green,
               color: C.cream,
               border: 'none',
-              cursor: loading ? 'not-allowed' : 'pointer',
+              cursor: 'pointer',
               fontSize: 13,
               fontWeight: 700,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
               marginTop: 8,
-              transition: 'background 0.15s',
+              transition: 'opacity 0.15s',
+              opacity: loading ? 0.7 : 1,
             }}
           >
             {loading ? '로그인 중...' : '로그인 →'}
@@ -373,7 +390,11 @@ export default function LoginPage({ onSwitch }) {
           >
             <div style={{ flex: 1, height: 1, background: C.border }} />
             <span
-              style={{ fontSize: 10, color: '#B0ABA4', letterSpacing: '0.1em' }}
+              style={{
+                fontSize: 10,
+                color: C.textMuted,
+                letterSpacing: '0.1em',
+              }}
             >
               OR
             </span>
