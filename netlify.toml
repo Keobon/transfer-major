@@ -4,12 +4,16 @@
   publish = "dist"
 
 [functions]
-  directory = "netlify/functions"
+  directory    = "netlify/functions"
+  node_bundler = "esbuild"
 
 [functions."major-gap-analysis"]
   timeout = 26
 
 [functions."recommend-majors"]
+  timeout = 26
+
+[functions."major-roadmap"]
   timeout = 26
 
 [functions."parse-pdf"]
