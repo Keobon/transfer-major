@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../supabase';
-import logo from '../assets/logo.png';
+import { logo, mascot } from '../assets';
 
 // ── ElevenLabs 에디토리얼 디자인 토큰 ──
 const C = {
@@ -59,12 +59,13 @@ export default function LoginPage({ onSwitch }) {
         @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
         @keyframes orbDrift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,-30px) scale(1.1)}}
         @keyframes orbDrift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-30px,40px) scale(1.05)}}
+        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
         * { box-sizing: border-box; }
         input::placeholder { color: ${C.mutedSoft}; }
         input:focus { outline: none; border-color: ${C.ink} !important; border-width: 2px !important; }
       `}</style>
 
-      {/* ── 왼쪽: 다크 잉크 패널 + 그라디언트 오브 ── */}
+      {/* ── 왼쪽: 다크 잉크 패널 + 그라디언트 오브 + 마스코트 ── */}
       <div
         style={{
           width: '42%',
@@ -108,7 +109,7 @@ export default function LoginPage({ onSwitch }) {
           }}
         />
 
-        {/* 로고 — 모노그램 + 텍스트 */}
+        {/* 로고 — 모노그램 + 텍스트 (상단) */}
         <div style={{ position: 'relative' }}>
           <div
             style={{
@@ -147,10 +148,46 @@ export default function LoginPage({ onSwitch }) {
           </p>
         </div>
 
-        {/* 중앙 영역 — 히어로 카피 제거, 빈 공간으로 그라디언트 오브가 호흡하도록 둠 */}
-        <div style={{ position: 'relative' }} />
+        {/* ── 중앙: 마스코트 캐릭터 — 메인 비주얼 ── */}
+        <div
+          style={{
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flex: 1,
+            padding: '32px 0',
+          }}
+        >
+          <img
+            src={mascot}
+            alt="Transfer Tomorrow 마스코트"
+            style={{
+              width: '85%',
+              maxWidth: 360,
+              height: 'auto',
+              display: 'block',
+              animation: 'float 5s ease-in-out infinite',
+              filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.4))',
+            }}
+          />
+          <p
+            style={{
+              fontSize: 12,
+              color: C.onDarkSoft,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              fontWeight: 600,
+              margin: '24px 0 0',
+              textAlign: 'center',
+            }}
+          >
+            Your Career Compass
+          </p>
+        </div>
 
-        {/* 하단 데이터 배지 — "실시간 채용공고" 제거, 학과 DB + 훈련과정 2개만 유지 */}
+        {/* 하단 데이터 배지 */}
         <div style={{ position: 'relative', display: 'flex', gap: 12 }}>
           {[
             { label: '학과 DB', value: '3,800+' },
@@ -207,7 +244,6 @@ export default function LoginPage({ onSwitch }) {
           overflow: 'hidden',
         }}
       >
-        {/* 미세한 피치 오브 */}
         <div
           style={{
             position: 'absolute',
@@ -346,7 +382,6 @@ export default function LoginPage({ onSwitch }) {
             </div>
           )}
 
-          {/* 잉크 핑(pill) — 단일 CTA */}
           <button
             onClick={handleLogin}
             disabled={loading}

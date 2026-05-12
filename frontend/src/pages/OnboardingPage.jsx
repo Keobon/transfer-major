@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../supabase';
-import logo from '../assets/logo.png';
+import { logo } from '../assets';
 
 const MAJORS = [
   '컴퓨터공학',

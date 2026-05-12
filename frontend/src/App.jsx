@@ -4,7 +4,7 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import OnboardingPage from './pages/OnboardingPage';
 import ResultPage from './pages/ResultPage';
-import logo from './assets/logo.png';
+import { logo } from './assets';
 
 function App() {
   const [session, setSession] = useState(null);
@@ -64,7 +64,6 @@ function App() {
           @keyframes orbDrift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-30px,40px) scale(1.05)}}
         `}</style>
 
-        {/* 파스텔 그라디언트 오브 — 라벤더 */}
         <div
           style={{
             position: 'absolute',
@@ -80,7 +79,6 @@ function App() {
             opacity: 0.7,
           }}
         />
-        {/* 파스텔 그라디언트 오브 — 피치 */}
         <div
           style={{
             position: 'absolute',
@@ -104,7 +102,7 @@ function App() {
             animation: 'fadeUp 0.5s ease',
           }}
         >
-          {/* 로고 모노그램 + 텍스트 — 디스플레이 300 */}
+          {/* 로고 모노그램 + 텍스트 */}
           <div
             style={{
               display: 'flex',
@@ -131,7 +129,6 @@ function App() {
             </div>
           </div>
 
-          {/* 로딩 인디케이터 — 잉크 컬러 */}
           <div
             style={{
               width: 32,
