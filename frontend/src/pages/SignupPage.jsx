@@ -34,27 +34,25 @@ export default function SignupPage({ onSwitch }) {
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // SignupPage.jsx의 handleSignup 수정
+  // SignupPage.jsx의 handleSignup 함수
   const handleSignup = async () => {
     setLoading(true);
     setError('');
 
-    // 인증 완료 후 돌아올 URL을 명시적으로 지정
-    // window.location.origin은 현재 도메인(배포 도메인 또는 localhost)을 자동 감지
+    // 인증 메일 링크 클릭 시 이동할 URL을 Netlify 배포 도메인으로 고정
+    // 로컬에서 가입해도 인증 후 배포 사이트로 이동하게 됨
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/`,
+        emailRedirectTo: 'https://transfer-tomorrow.netlify.app',
       },
     });
 
     if (error) {
-      // 이미 가입된 이메일인 경우 친절한 메시지로 변환
+      // 이미 가입된 이메일 케이스를 친절한 메시지로 변환
       if (error.message.includes('already registered')) {
-        setError(
-          '이미 가입된 이메일입니다. 로그인을 시도하거나 비밀번호 재설정을 이용하세요.',
-        );
+        setError('이미 가입된 이메일입니다. 로그인을 시도해주세요.');
       } else {
         setError(error.message);
       }
