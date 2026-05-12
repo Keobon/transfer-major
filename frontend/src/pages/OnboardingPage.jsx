@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../supabase';
+import logo from '../assets/logo.png';
 
 const MAJORS = [
   '컴퓨터공학',
@@ -86,16 +87,14 @@ export default function OnboardingPage({ session, onComplete }) {
     }
     setLoading(true);
     setError('');
-    const { error: e } = await supabase
-      .from('profiles')
-      .upsert(
-        {
-          user_id: session.user.id,
-          current_major: finalCurrentMajor,
-          grade: parseInt(grade),
-        },
-        { onConflict: 'user_id' },
-      );
+    const { error: e } = await supabase.from('profiles').upsert(
+      {
+        user_id: session.user.id,
+        current_major: finalCurrentMajor,
+        grade: parseInt(grade),
+      },
+      { onConflict: 'user_id' },
+    );
     if (e) setError(e.message);
     else setStep(2);
     setLoading(false);
@@ -153,18 +152,16 @@ export default function OnboardingPage({ session, onComplete }) {
     const finalTargetSeq = showCustomInput ? null : selectedMajor?.seq;
     if (!finalTargetName) return;
     setLoading(true);
-    await supabase
-      .from('profiles')
-      .upsert(
-        {
-          user_id: session.user.id,
-          current_major: finalCurrentMajor,
-          target_major: finalTargetName,
-          target_major_seq: finalTargetSeq,
-          grade: parseInt(grade),
-        },
-        { onConflict: 'user_id' },
-      );
+    await supabase.from('profiles').upsert(
+      {
+        user_id: session.user.id,
+        current_major: finalCurrentMajor,
+        target_major: finalTargetName,
+        target_major_seq: finalTargetSeq,
+        grade: parseInt(grade),
+      },
+      { onConflict: 'user_id' },
+    );
     onComplete(
       {
         current_major: finalCurrentMajor,
@@ -241,7 +238,13 @@ export default function OnboardingPage({ session, onComplete }) {
           borderBottom: `1px solid ${C.hairline}`,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          {/* 로고 모노그램 */}
+          <img
+            src={logo}
+            alt="Transfer Tomorrow"
+            style={{ height: 32, width: 'auto', display: 'block' }}
+          />
           <span
             style={{
               fontSize: 18,
@@ -422,10 +425,8 @@ export default function OnboardingPage({ session, onComplete }) {
                       fontSize: 14,
                       cursor: 'pointer',
                       border: `1px solid ${currentMajor === m ? C.ink : C.hairline}`,
-                      background:
-                        currentMajor === m ? C.ink : C.surface,
-                      color:
-                        currentMajor === m ? C.onDark : C.ink,
+                      background: currentMajor === m ? C.ink : C.surface,
+                      color: currentMajor === m ? C.onDark : C.ink,
                       fontWeight: currentMajor === m ? 500 : 400,
                       transition: 'all 0.15s',
                       letterSpacing: '0.01em',
@@ -446,8 +447,7 @@ export default function OnboardingPage({ session, onComplete }) {
                       currentMajor === '기타직접입력'
                         ? C.canvasSoft
                         : 'transparent',
-                    color:
-                      currentMajor === '기타직접입력' ? C.ink : C.muted,
+                    color: currentMajor === '기타직접입력' ? C.ink : C.muted,
                     fontWeight: currentMajor === '기타직접입력' ? 500 : 400,
                   }}
                 >
@@ -518,9 +518,7 @@ export default function OnboardingPage({ session, onComplete }) {
               </div>
 
               {error && (
-                <p
-                  style={{ color: C.error, fontSize: 13, marginBottom: 12 }}
-                >
+                <p style={{ color: C.error, fontSize: 13, marginBottom: 12 }}>
                   {error}
                 </p>
               )}
@@ -598,8 +596,7 @@ export default function OnboardingPage({ session, onComplete }) {
                       cursor: 'pointer',
                       textAlign: 'left',
                       border: `1px solid ${examType === t ? C.ink : C.hairline}`,
-                      background:
-                        examType === t ? C.canvasSoft : C.surface,
+                      background: examType === t ? C.canvasSoft : C.surface,
                       transition: 'all 0.15s',
                     }}
                   >
@@ -751,9 +748,7 @@ export default function OnboardingPage({ session, onComplete }) {
               </div>
 
               {pdfError && (
-                <p
-                  style={{ color: C.error, fontSize: 13, marginBottom: 12 }}
-                >
+                <p style={{ color: C.error, fontSize: 13, marginBottom: 12 }}>
                   {pdfError}
                 </p>
               )}
@@ -768,9 +763,7 @@ export default function OnboardingPage({ session, onComplete }) {
                     marginBottom: 16,
                   }}
                 >
-                  <p
-                    style={{ fontSize: 14, color: C.ink, margin: 0 }}
-                  >
+                  <p style={{ fontSize: 14, color: C.ink, margin: 0 }}>
                     분석 완료 · 홀랜드 코드{' '}
                     <span
                       style={{
@@ -871,9 +864,7 @@ export default function OnboardingPage({ session, onComplete }) {
                   (!pdfFile && recommendedMajors.length === 0)
                 }
                 style={{
-                  ...primaryBtn(
-                    pdfFile || recommendedMajors.length > 0,
-                  ),
+                  ...primaryBtn(pdfFile || recommendedMajors.length > 0),
                   marginBottom: 10,
                 }}
                 onMouseEnter={(e) => {
@@ -959,8 +950,7 @@ export default function OnboardingPage({ session, onComplete }) {
               >
                 {recommendedMajors.map((maj, i) => {
                   const isSelected = selectedMajor?.seq === maj.seq;
-                  const catColor =
-                    CATEGORY_COLOR[maj.category] || C.gSky;
+                  const catColor = CATEGORY_COLOR[maj.category] || C.gSky;
                   return (
                     <div
                       key={i}
@@ -1161,17 +1151,11 @@ export default function OnboardingPage({ session, onComplete }) {
                   marginBottom: 10,
                 }}
                 onMouseEnter={(e) => {
-                  if (
-                    (selectedMajor || customMajorInput) &&
-                    !loading
-                  )
+                  if ((selectedMajor || customMajorInput) && !loading)
                     e.currentTarget.style.background = C.ink;
                 }}
                 onMouseLeave={(e) => {
-                  if (
-                    (selectedMajor || customMajorInput) &&
-                    !loading
-                  )
+                  if ((selectedMajor || customMajorInput) && !loading)
                     e.currentTarget.style.background = C.primary;
                 }}
               >

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../supabase';
+import logo from '../assets/logo.png';
 
 // ── ElevenLabs 에디토리얼 디자인 토큰 ──
 const C = {
@@ -107,18 +108,31 @@ export default function SignupPage({ onSwitch }) {
           }}
         />
 
-        {/* 로고 */}
+        {/* 로고 — 모노그램 + 텍스트 */}
         <div style={{ position: 'relative' }}>
           <div
             style={{
-              fontSize: 22,
-              fontWeight: 300,
-              color: C.onDark,
-              letterSpacing: '-0.03em',
-              marginBottom: 12,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+              marginBottom: 14,
             }}
           >
-            내일<span style={{ fontWeight: 500 }}>환승</span>
+            <img
+              src={logo}
+              alt="Transfer Tomorrow"
+              style={{ height: 36, width: 'auto', display: 'block' }}
+            />
+            <div
+              style={{
+                fontSize: 22,
+                fontWeight: 300,
+                color: C.onDark,
+                letterSpacing: '-0.03em',
+              }}
+            >
+              내일<span style={{ fontWeight: 500 }}>환승</span>
+            </div>
           </div>
           <p
             style={{

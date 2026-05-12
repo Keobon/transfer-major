@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import OnboardingPage from './pages/OnboardingPage';
 import ResultPage from './pages/ResultPage';
+import logo from './assets/logo.png';
 
 function App() {
   const [session, setSession] = useState(null);
@@ -103,17 +104,31 @@ function App() {
             animation: 'fadeUp 0.5s ease',
           }}
         >
-          {/* 로고 — 디스플레이 300 */}
+          {/* 로고 모노그램 + 텍스트 — 디스플레이 300 */}
           <div
             style={{
-              fontSize: 28,
-              fontWeight: 300,
-              color: '#0c0a09',
-              letterSpacing: '-0.04em',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 14,
               marginBottom: 40,
             }}
           >
-            내일<span style={{ fontWeight: 500 }}>환승</span>
+            <img
+              src={logo}
+              alt="Transfer Tomorrow"
+              style={{ height: 40, width: 'auto', display: 'block' }}
+            />
+            <div
+              style={{
+                fontSize: 28,
+                fontWeight: 300,
+                color: '#0c0a09',
+                letterSpacing: '-0.04em',
+              }}
+            >
+              내일<span style={{ fontWeight: 500 }}>환승</span>
+            </div>
           </div>
 
           {/* 로딩 인디케이터 — 잉크 컬러 */}

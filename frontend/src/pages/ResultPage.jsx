@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabase';
+import logo from '../assets/logo.png';
 
 // ── ElevenLabs 에디토리얼 디자인 토큰 ──
 const C = {
@@ -303,6 +304,32 @@ export default function ResultPage({ session, profile, pdfResult }) {
             animation: 'fadeUp 0.5s ease',
           }}
         >
+          {/* 로고 + 텍스트 */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 14,
+              marginBottom: 36,
+            }}
+          >
+            <img
+              src={logo}
+              alt="Transfer Tomorrow"
+              style={{ height: 40, width: 'auto', display: 'block' }}
+            />
+            <div
+              style={{
+                fontSize: 24,
+                fontWeight: 300,
+                color: C.onDark,
+                letterSpacing: '-0.03em',
+              }}
+            >
+              내일<span style={{ fontWeight: 500 }}>환승</span>
+            </div>
+          </div>
           <div
             style={{
               width: 36,
@@ -434,7 +461,7 @@ export default function ResultPage({ session, profile, pdfResult }) {
         *{box-sizing:border-box}
       `}</style>
 
-      {/* ── 헤더 — 라이트 ── */}
+      {/* ── 헤더 — 라이트 + 로고 ── */}
       <div
         style={{
           background: C.canvas,
@@ -449,7 +476,13 @@ export default function ResultPage({ session, profile, pdfResult }) {
           borderBottom: `1px solid ${C.hairline}`,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          {/* 로고 모노그램 */}
+          <img
+            src={logo}
+            alt="Transfer Tomorrow"
+            style={{ height: 32, width: 'auto', display: 'block' }}
+          />
           <span
             style={{
               fontSize: 18,
@@ -1922,6 +1955,8 @@ export default function ResultPage({ session, profile, pdfResult }) {
         )}
 
         {/* ════════ TAB: 공모전 ════════ */}
+        {/* 공모전 카드 클릭으로 외부 링크 이동 기능 제거 */}
+        {/* 하단의 명시적 "위비티/씽굿에서 더 찾기" 버튼은 사용자가 직접 검색 진입할 때만 사용되도록 유지 */}
         {activeTab === 'contests' && (
           <div style={{ animation: 'fadeUp 0.3s ease' }}>
             <p style={{ ...sectionTitle, marginBottom: 6 }}>관련 공모전</p>
@@ -1933,136 +1968,116 @@ export default function ResultPage({ session, profile, pdfResult }) {
                 letterSpacing: '0.01em',
               }}
             >
-              {profile.target_major} 관련 공모전 — 클릭하면 위비티에서 관련
-              공모전을 검색합니다
+              {profile.target_major} 관련 공모전 정보입니다
             </p>
             {result.contests?.length > 0 ? (
-              result.contests.map((c, i) => {
-                const searchUrl = `https://www.wevity.com/?c=find&s=${encodeURIComponent(c.category || majorKeyword)}`;
-                return (
+              result.contests.map((c, i) => (
+                <div key={i} style={card}>
                   <div
-                    key={i}
-                    onClick={() => window.open(searchUrl, '_blank')}
                     style={{
-                      ...card,
-                      cursor: 'pointer',
-                      transition: 'border-color 0.15s, box-shadow 0.15s',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = C.ink;
-                      e.currentTarget.style.boxShadow =
-                        '0 4px 16px rgba(0,0,0,0.04)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = C.hairline;
-                      e.currentTarget.style.boxShadow = 'none';
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      marginBottom: 10,
                     }}
                   >
-                    <div
+                    <span
                       style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'flex-start',
-                        marginBottom: 10,
+                        fontSize: 15,
+                        fontWeight: 500,
+                        color: C.ink,
+                        flex: 1,
+                        marginRight: 14,
+                        lineHeight: 1.45,
+                        letterSpacing: '-0.01em',
                       }}
                     >
+                      {c.name}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        background: C.surfaceStrong,
+                        color: C.ink,
+                        padding: '3px 10px',
+                        borderRadius: 9999,
+                        fontWeight: 500,
+                        flexShrink: 0,
+                        letterSpacing: '0.04em',
+                      }}
+                    >
+                      {c.category}
+                    </span>
+                  </div>
+                  <p
+                    style={{
+                      fontSize: 13,
+                      color: C.body,
+                      fontWeight: 400,
+                      margin: '0 0 12px',
+                      letterSpacing: '0.01em',
+                    }}
+                  >
+                    {c.organizer}
+                  </p>
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: 6,
+                      flexWrap: 'wrap',
+                      marginBottom: c.tip ? 12 : 0,
+                    }}
+                  >
+                    {c.period && (
                       <span
                         style={{
-                          fontSize: 15,
-                          fontWeight: 500,
-                          color: C.ink,
-                          flex: 1,
-                          marginRight: 14,
-                          lineHeight: 1.45,
-                          letterSpacing: '-0.01em',
-                        }}
-                      >
-                        {c.name}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: 10,
+                          fontSize: 11,
                           background: C.surfaceStrong,
                           color: C.ink,
-                          padding: '3px 10px',
+                          padding: '4px 10px',
                           borderRadius: 9999,
-                          fontWeight: 500,
-                          flexShrink: 0,
-                          letterSpacing: '0.04em',
+                          letterSpacing: '0.01em',
                         }}
                       >
-                        {c.category}
+                        {c.period}
                       </span>
-                    </div>
+                    )}
+                    {c.benefit && (
+                      <span
+                        style={{
+                          fontSize: 11,
+                          background: C.surfaceStrong,
+                          color: C.ink,
+                          padding: '4px 10px',
+                          borderRadius: 9999,
+                          letterSpacing: '0.01em',
+                        }}
+                      >
+                        {c.benefit}
+                      </span>
+                    )}
+                  </div>
+                  {c.tip && (
                     <p
                       style={{
                         fontSize: 13,
                         color: C.body,
-                        fontWeight: 400,
-                        margin: '0 0 12px',
+                        margin: 0,
+                        lineHeight: 1.65,
                         letterSpacing: '0.01em',
                       }}
                     >
-                      {c.organizer}
+                      {c.tip}
                     </p>
-                    <div
-                      style={{
-                        display: 'flex',
-                        gap: 6,
-                        flexWrap: 'wrap',
-                        marginBottom: c.tip ? 12 : 0,
-                      }}
-                    >
-                      {c.period && (
-                        <span
-                          style={{
-                            fontSize: 11,
-                            background: C.surfaceStrong,
-                            color: C.ink,
-                            padding: '4px 10px',
-                            borderRadius: 9999,
-                            letterSpacing: '0.01em',
-                          }}
-                        >
-                          {c.period}
-                        </span>
-                      )}
-                      {c.benefit && (
-                        <span
-                          style={{
-                            fontSize: 11,
-                            background: C.surfaceStrong,
-                            color: C.ink,
-                            padding: '4px 10px',
-                            borderRadius: 9999,
-                            letterSpacing: '0.01em',
-                          }}
-                        >
-                          {c.benefit}
-                        </span>
-                      )}
-                    </div>
-                    {c.tip && (
-                      <p
-                        style={{
-                          fontSize: 13,
-                          color: C.body,
-                          margin: 0,
-                          lineHeight: 1.65,
-                          letterSpacing: '0.01em',
-                        }}
-                      >
-                        {c.tip}
-                      </p>
-                    )}
-                  </div>
-                );
-              })
+                  )}
+                </div>
+              ))
             ) : (
               <div style={{ textAlign: 'center', padding: 56, color: C.muted }}>
                 <p>관련 공모전 정보가 없습니다</p>
               </div>
             )}
+            {/* 명시적 외부 검색 진입 버튼만 유지 */}
             <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
               <a
                 href={`https://www.wevity.com/?c=find&s=${encodeURIComponent(majorKeyword)}`}

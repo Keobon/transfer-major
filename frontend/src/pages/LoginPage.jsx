@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../supabase';
+import logo from '../assets/logo.png';
 
 // ── ElevenLabs 에디토리얼 디자인 토큰 ──
 const C = {
@@ -107,18 +108,31 @@ export default function LoginPage({ onSwitch }) {
           }}
         />
 
-        {/* 로고 — 에디토리얼 300 */}
+        {/* 로고 — 모노그램 + 텍스트 */}
         <div style={{ position: 'relative' }}>
           <div
             style={{
-              fontSize: 22,
-              fontWeight: 300,
-              color: C.onDark,
-              letterSpacing: '-0.03em',
-              marginBottom: 12,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+              marginBottom: 14,
             }}
           >
-            내일<span style={{ fontWeight: 500 }}>환승</span>
+            <img
+              src={logo}
+              alt="Transfer Tomorrow"
+              style={{ height: 36, width: 'auto', display: 'block' }}
+            />
+            <div
+              style={{
+                fontSize: 22,
+                fontWeight: 300,
+                color: C.onDark,
+                letterSpacing: '-0.03em',
+              }}
+            >
+              내일<span style={{ fontWeight: 500 }}>환승</span>
+            </div>
           </div>
           <p
             style={{
@@ -133,57 +147,13 @@ export default function LoginPage({ onSwitch }) {
           </p>
         </div>
 
-        {/* 히어로 — 디스플레이 300 */}
-        <div style={{ position: 'relative' }}>
-          <p
-            style={{
-              fontSize: 11,
-              color: C.onDarkSoft,
-              fontWeight: 600,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase',
-              margin: '0 0 24px',
-            }}
-          >
-            Major Transfer Analysis
-          </p>
-          <h1
-            style={{
-              fontSize: 44,
-              fontWeight: 300,
-              color: C.onDark,
-              lineHeight: 1.12,
-              margin: '0 0 24px',
-              letterSpacing: '-0.03em',
-            }}
-          >
-            나의 내일,
-            <br />
-            지속 가능한 일로
-          </h1>
-          <p
-            style={{
-              fontSize: 14,
-              color: C.onDarkSoft,
-              lineHeight: 1.7,
-              margin: 0,
-              fontWeight: 400,
-              letterSpacing: '0.01em',
-            }}
-          >
-            커리어넷 · 워크넷 실제 데이터와
-            <br />
-            AI 분석으로 나에게 맞는 전공을
-            <br />
-            정확하게 진단합니다
-          </p>
-        </div>
+        {/* 중앙 영역 — 히어로 카피 제거, 빈 공간으로 그라디언트 오브가 호흡하도록 둠 */}
+        <div style={{ position: 'relative' }} />
 
-        {/* 데이터 배지 — 다크 카드 */}
+        {/* 하단 데이터 배지 — "실시간 채용공고" 제거, 학과 DB + 훈련과정 2개만 유지 */}
         <div style={{ position: 'relative', display: 'flex', gap: 12 }}>
           {[
             { label: '학과 DB', value: '3,800+' },
-            { label: '채용공고', value: '실시간' },
             { label: '훈련과정', value: 'HRD-Net' },
           ].map((item) => (
             <div
