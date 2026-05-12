@@ -46,6 +46,21 @@ export default function LoginPage({ onSwitch }) {
     setLoading(false);
   };
 
+  // 비밀번호 재설정 메일 발송 함수
+  const handlePasswordReset = async () => {
+    if (!email) {
+      setError('이메일을 입력해주세요');
+      return;
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    if (error) setError(error.message);
+    else alert('비밀번호 재설정 메일을 발송했습니다');
+  };
+
   return (
     <div
       style={{

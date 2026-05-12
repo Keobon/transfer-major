@@ -34,13 +34,33 @@ export default function SignupPage({ onSwitch }) {
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // ── 로직 원본 유지 ──
+  // SignupPage.jsx의 handleSignup 수정
   const handleSignup = async () => {
     setLoading(true);
     setError('');
-    const { error } = await supabase.auth.signUp({ email, password });
-    if (error) setError(error.message);
-    else setDone(true);
+
+    // 인증 완료 후 돌아올 URL을 명시적으로 지정
+    // window.location.origin은 현재 도메인(배포 도메인 또는 localhost)을 자동 감지
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/`,
+      },
+    });
+
+    if (error) {
+      // 이미 가입된 이메일인 경우 친절한 메시지로 변환
+      if (error.message.includes('already registered')) {
+        setError(
+          '이미 가입된 이메일입니다. 로그인을 시도하거나 비밀번호 재설정을 이용하세요.',
+        );
+      } else {
+        setError(error.message);
+      }
+    } else {
+      setDone(true);
+    }
     setLoading(false);
   };
 
