@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabase';
-import { logo } from '../assets';
+import logo from '../assets/logo.png';
 
 // ── ElevenLabs 에디토리얼 디자인 토큰 ──
 const C = {
