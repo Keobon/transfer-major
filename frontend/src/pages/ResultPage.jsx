@@ -1,26 +1,40 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabase';
 
-// ── 디자인 토큰 ─────────────────────────────────
+// ── ElevenLabs 에디토리얼 디자인 토큰 ──
 const C = {
-  bg: '#F5F2EC',
-  surface: '#FFFFFF',
-  green: '#1A3A2F',
-  greenMid: '#2D5A45',
-  greenLt: '#4A7C5F',
-  cream: '#F5F2EC',
-  gold: '#B8975A',
-  goldLt: '#D4AF7A',
-  text: '#1A1A1A',
-  textSub: '#5C5C5C',
-  textMuted: '#9A9A9A',
-  border: '#E0DAD0',
-  danger: '#8B3A3A',
+  canvas: '#f5f5f5',
+  canvasSoft: '#fafafa',
+  surface: '#ffffff',
+  surfaceStrong: '#f0efed',
+  surfaceDark: '#0c0a09',
+  surfaceDarkElevated: '#1c1917',
+  ink: '#0c0a09',
+  primary: '#292524',
+  body: '#4e4e4e',
+  muted: '#777169',
+  mutedSoft: '#a8a29e',
+  hairline: '#e7e5e4',
+  hairlineSoft: '#f0efed',
+  hairlineStrong: '#d6d3d1',
+  onPrimary: '#ffffff',
+  onDark: '#ffffff',
+  onDarkSoft: '#a8a29e',
+  gMint: '#a7e5d3',
+  gPeach: '#f4c5a8',
+  gLavender: '#c8b8e0',
+  gSky: '#a8c8e8',
+  gRose: '#e8b8c4',
+  success: '#16a34a',
+  error: '#dc2626',
 };
 
-const scoreColor = (s) => (s >= 75 ? C.greenMid : s >= 50 ? C.gold : C.danger);
+// ── 점수 라벨(컬러 의존 없이 텍스트로) ──
 const scoreLabel = (s) =>
   s >= 75 ? '전환 가능성 높음' : s >= 50 ? '준비 필요' : '도전적 목표';
+
+// ── 점수 액센트 컬러 — 파스텔 그라디언트 톤만 사용 ──
+const scoreOrb = (s) => (s >= 75 ? C.gMint : s >= 50 ? C.gPeach : C.gRose);
 
 function parseEmployment(str) {
   if (!str) return '정보 없음';
@@ -28,24 +42,25 @@ function parseEmployment(str) {
   return num ? `${num[0]}%` : str;
 }
 
+// ── 공용 카드 스타일 ──
 const card = {
-  background: '#FFFFFF',
-  border: '1px solid #E0DAD0',
-  borderRadius: 12,
-  padding: '20px 24px',
+  background: C.surface,
+  border: `1px solid ${C.hairline}`,
+  borderRadius: 16,
+  padding: '24px 28px',
   marginBottom: 16,
 };
 
 const sectionTitle = {
-  fontSize: 10,
-  fontWeight: 700,
-  letterSpacing: '0.14em',
+  fontSize: 11,
+  fontWeight: 600,
+  letterSpacing: '0.16em',
   textTransform: 'uppercase',
-  color: '#2D5A45',
-  margin: '0 0 16px',
+  color: C.muted,
+  margin: '0 0 18px',
 };
 
-// ── 레이더 차트 ───────────────────────────────────
+// ── 레이더 차트 — 잉크/파스텔 톤 ──
 function RadarChart({ data }) {
   const cx = 120,
     cy = 120,
@@ -80,7 +95,13 @@ function RadarChart({ data }) {
       style={{ margin: '0 auto', display: 'block' }}
     >
       {circles.map((path, i) => (
-        <path key={i} d={path} fill="none" stroke="#E0DAD0" strokeWidth={1} />
+        <path
+          key={i}
+          d={path}
+          fill="none"
+          stroke={C.hairline}
+          strokeWidth={1}
+        />
       ))}
       {data.map((_, i) => {
         const [x, y] = point(100, i);
@@ -91,23 +112,25 @@ function RadarChart({ data }) {
             y1={cy}
             x2={x}
             y2={y}
-            stroke="#E0DAD0"
+            stroke={C.hairline}
             strokeWidth={1}
           />
         );
       })}
+      {/* 목표 수준 — 잉크 점선 */}
       <path
         d={toPath(requiredPts)}
-        fill="#1A3A2F18"
-        stroke="#1A3A2F"
-        strokeWidth={1.5}
+        fill={`${C.ink}08`}
+        stroke={C.ink}
+        strokeWidth={1.2}
         strokeDasharray="4,3"
       />
+      {/* 현재 역량 — 파스텔 라벤더 */}
       <path
         d={toPath(currentPts)}
-        fill="#B8975A30"
-        stroke="#B8975A"
-        strokeWidth={2}
+        fill={`${C.gLavender}50`}
+        stroke={C.primary}
+        strokeWidth={1.5}
       />
       {data.map((d, i) => {
         const [lx, ly] = labelPos(i);
@@ -118,8 +141,8 @@ function RadarChart({ data }) {
             y={ly}
             textAnchor="middle"
             dominantBaseline="middle"
-            fontSize="9"
-            fill="#5C5C5C"
+            fontSize="10"
+            fill={C.body}
             fontFamily="'Pretendard', sans-serif"
             fontWeight="500"
           >
@@ -131,7 +154,7 @@ function RadarChart({ data }) {
   );
 }
 
-// ── 메인 컴포넌트 ─────────────────────────────────
+// ── 메인 컴포넌트 ──
 export default function ResultPage({ session, profile, pdfResult }) {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -151,6 +174,7 @@ export default function ResultPage({ session, profile, pdfResult }) {
     runAnalysis();
   }, []);
 
+  // ── 로직 원본 유지 ──
   const runAnalysis = async () => {
     setLoading(true);
     setError('');
@@ -221,13 +245,13 @@ export default function ResultPage({ session, profile, pdfResult }) {
     setRoadmapLoading(false);
   };
 
-  // ── 로딩 ──────────────────────────────────────
+  // ── 로딩 ──
   if (loading)
     return (
       <div
         style={{
           minHeight: '100vh',
-          background: C.green,
+          background: C.surfaceDark,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -235,22 +259,41 @@ export default function ResultPage({ session, profile, pdfResult }) {
           gap: 20,
           position: 'relative',
           overflow: 'hidden',
+          fontFamily:
+            "'Pretendard','Apple SD Gothic Neo','Noto Sans KR',sans-serif",
         }}
       >
-        <style>{`@keyframes spin{to{transform:rotate(360deg)}} @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}`}</style>
+        <style>{`
+          @keyframes spin{to{transform:rotate(360deg)}}
+          @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+          @keyframes orbDrift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,-30px) scale(1.1)}}
+          @keyframes orbDrift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-30px,40px) scale(1.05)}}
+        `}</style>
+        {/* 파스텔 그라디언트 오브 */}
         <div
           style={{
             position: 'absolute',
-            inset: 0,
-            backgroundImage: `radial-gradient(ellipse 70% 50% at 50% 100%, ${C.greenMid} 0%, transparent 70%)`,
-            opacity: 0.6,
+            top: '15%',
+            left: '15%',
+            width: 420,
+            height: 420,
+            borderRadius: '50%',
+            background: `radial-gradient(circle, ${C.gMint}50 0%, rgba(167,229,211,0) 70%)`,
+            filter: 'blur(40px)',
+            animation: 'orbDrift1 10s ease-in-out infinite',
           }}
         />
         <div
           style={{
             position: 'absolute',
-            inset: 0,
-            backgroundImage: `repeating-linear-gradient(0deg,transparent,transparent 18px,${C.greenMid}20 18px,${C.greenMid}20 19px),repeating-linear-gradient(90deg,transparent,transparent 18px,${C.greenMid}20 18px,${C.greenMid}20 19px)`,
+            bottom: '15%',
+            right: '15%',
+            width: 380,
+            height: 380,
+            borderRadius: '50%',
+            background: `radial-gradient(circle, ${C.gLavender}50 0%, rgba(200,184,224,0) 70%)`,
+            filter: 'blur(40px)',
+            animation: 'orbDrift2 12s ease-in-out infinite',
           }}
         />
         <div
@@ -262,32 +305,33 @@ export default function ResultPage({ session, profile, pdfResult }) {
         >
           <div
             style={{
-              width: 48,
-              height: 48,
-              border: `2px solid ${C.gold}40`,
-              borderTopColor: C.gold,
+              width: 36,
+              height: 36,
+              border: `1.5px solid rgba(255,255,255,0.15)`,
+              borderTopColor: C.onDark,
               borderRadius: '50%',
-              animation: 'spin 1.2s linear infinite',
-              margin: '0 auto 28px',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto 32px',
             }}
           />
           <p
             style={{
-              color: C.cream,
-              fontSize: 15,
-              fontWeight: 600,
-              margin: '0 0 8px',
-              letterSpacing: '0.02em',
+              color: C.onDark,
+              fontSize: 16,
+              fontWeight: 400,
+              margin: '0 0 12px',
+              letterSpacing: '0.01em',
             }}
           >
             {loadingMsg}
           </p>
           <p
             style={{
-              color: `${C.cream}50`,
-              fontSize: 10,
+              color: C.onDarkSoft,
+              fontSize: 11,
               letterSpacing: '0.2em',
               textTransform: 'uppercase',
+              margin: 0,
             }}
           >
             CONNECT · VERIFY · EMPOWER
@@ -296,43 +340,53 @@ export default function ResultPage({ session, profile, pdfResult }) {
       </div>
     );
 
-  // ── 오류 ──────────────────────────────────────
+  // ── 오류 ──
   if (error)
     return (
       <div
         style={{
           minHeight: '100vh',
-          background: C.bg,
+          background: C.canvas,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          fontFamily:
+            "'Pretendard','Apple SD Gothic Neo','Noto Sans KR',sans-serif",
         }}
       >
         <div
           style={{
             background: C.surface,
-            border: `1px solid ${C.border}`,
+            border: `1px solid ${C.hairline}`,
             borderRadius: 16,
-            padding: 40,
+            padding: 48,
             textAlign: 'center',
             maxWidth: 400,
           }}
         >
-          <p style={{ color: C.danger, fontSize: 14, marginBottom: 20 }}>
+          <p
+            style={{
+              color: C.error,
+              fontSize: 14,
+              marginBottom: 24,
+              letterSpacing: '0.01em',
+            }}
+          >
             오류: {error}
           </p>
           <button
             onClick={runAnalysis}
             style={{
-              padding: '12px 32px',
-              borderRadius: 8,
-              background: C.green,
-              color: C.cream,
+              padding: '10px 28px',
+              height: 44,
+              borderRadius: 9999,
+              background: C.primary,
+              color: C.onPrimary,
               border: 'none',
               cursor: 'pointer',
-              fontSize: 13,
-              fontWeight: 600,
-              letterSpacing: '0.06em',
+              fontSize: 15,
+              fontWeight: 500,
+              letterSpacing: '0.01em',
             }}
           >
             다시 시도
@@ -367,76 +421,51 @@ export default function ResultPage({ session, profile, pdfResult }) {
     <div
       style={{
         minHeight: '100vh',
-        background: C.bg,
-        fontFamily: "'Pretendard','Apple SD Gothic Neo',sans-serif",
+        background: C.canvas,
+        fontFamily:
+          "'Pretendard','Apple SD Gothic Neo','Noto Sans KR',sans-serif",
       }}
     >
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}} @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}} *{box-sizing:border-box}`}</style>
+      <style>{`
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes orbDrift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,-30px) scale(1.1)}}
+        @keyframes orbDrift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-30px,40px) scale(1.05)}}
+        *{box-sizing:border-box}
+      `}</style>
 
-      {/* ── 헤더 ───────────────────────────── */}
+      {/* ── 헤더 — 라이트 ── */}
       <div
         style={{
-          background: C.green,
-          height: 56,
-          padding: '0 24px',
+          background: C.canvas,
+          height: 64,
+          padding: '0 32px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           position: 'sticky',
           top: 0,
           zIndex: 100,
-          overflow: 'hidden',
+          borderBottom: `1px solid ${C.hairline}`,
         }}
       >
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage: `repeating-linear-gradient(0deg,transparent,transparent 8px,${C.greenMid}25 8px,${C.greenMid}25 9px)`,
-            pointerEvents: 'none',
-          }}
-        />
-        <div
-          style={{
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-          }}
-        >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <span
             style={{
-              fontSize: 15,
-              fontWeight: 800,
-              color: C.cream,
-              letterSpacing: '-0.02em',
-            }}
-          >
-            내일
-          </span>
-          <span
-            style={{
-              fontSize: 15,
+              fontSize: 18,
               fontWeight: 300,
-              color: C.gold,
-              letterSpacing: '0.1em',
+              color: C.ink,
+              letterSpacing: '-0.03em',
             }}
           >
-            환승
+            내일<span style={{ fontWeight: 500 }}>환승</span>
           </span>
-          <div
-            style={{
-              width: 1,
-              height: 14,
-              background: `${C.cream}25`,
-              margin: '0 4px',
-            }}
-          />
+          <div style={{ width: 1, height: 14, background: C.hairline }} />
           <span
             style={{
-              fontSize: 10,
-              color: `${C.cream}60`,
-              letterSpacing: '0.04em',
+              fontSize: 12,
+              color: C.muted,
+              letterSpacing: '0.01em',
             }}
           >
             자신과 잘맞는 일을 찾는 것
@@ -445,108 +474,129 @@ export default function ResultPage({ session, profile, pdfResult }) {
         <button
           onClick={() => supabase.auth.signOut()}
           style={{
-            position: 'relative',
-            fontSize: 10,
-            padding: '6px 14px',
-            border: `1px solid ${C.cream}25`,
-            borderRadius: 6,
+            fontSize: 13,
+            padding: '8px 16px',
+            height: 36,
+            border: `1px solid ${C.hairlineStrong}`,
+            borderRadius: 9999,
             cursor: 'pointer',
             background: 'transparent',
-            color: `${C.cream}70`,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
+            color: C.ink,
+            fontWeight: 500,
+            letterSpacing: '0.01em',
           }}
         >
           Logout
         </button>
       </div>
 
-      {/* ── 히어로 ─────────────────────────── */}
+      {/* ── 히어로 — 다크 잉크 + 그라디언트 오브 ── */}
       <div
         style={{
-          background: C.green,
-          padding: '44px 24px 52px',
+          background: C.surfaceDark,
+          padding: '64px 24px 72px',
           position: 'relative',
           overflow: 'hidden',
         }}
       >
+        {/* 점수 톤 그라디언트 오브 */}
         <div
           style={{
             position: 'absolute',
-            inset: 0,
-            backgroundImage: `radial-gradient(ellipse 80% 60% at 50% 110%, ${C.greenMid}70 0%, transparent 70%)`,
+            top: '10%',
+            left: '15%',
+            width: 380,
+            height: 380,
+            borderRadius: '50%',
+            background: `radial-gradient(circle, ${scoreOrb(sc)}60 0%, rgba(0,0,0,0) 70%)`,
+            filter: 'blur(40px)',
+            animation: 'orbDrift1 11s ease-in-out infinite',
             pointerEvents: 'none',
           }}
         />
         <div
           style={{
             position: 'absolute',
-            inset: 0,
-            backgroundImage: `repeating-conic-gradient(${C.greenMid}08 0% 25%, transparent 0% 50%)`,
-            backgroundSize: '28px 28px',
+            bottom: '5%',
+            right: '15%',
+            width: 320,
+            height: 320,
+            borderRadius: '50%',
+            background: `radial-gradient(circle, ${C.gLavender}40 0%, rgba(0,0,0,0) 70%)`,
+            filter: 'blur(40px)',
+            animation: 'orbDrift2 13s ease-in-out infinite',
             pointerEvents: 'none',
           }}
         />
-        <div style={{ maxWidth: 640, margin: '0 auto', position: 'relative' }}>
+
+        <div style={{ maxWidth: 720, margin: '0 auto', position: 'relative' }}>
           {/* 경로 */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 10,
-              marginBottom: 32,
+              gap: 14,
+              marginBottom: 40,
             }}
           >
-            <span style={{ fontSize: 12, color: `${C.cream}60` }}>
+            <span style={{ fontSize: 13, color: C.onDarkSoft }}>
               {profile.current_major}
             </span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-              <div style={{ width: 16, height: 1, background: C.gold }} />
-              <div
-                style={{
-                  width: 5,
-                  height: 5,
-                  borderRadius: '50%',
-                  background: C.gold,
-                }}
-              />
-              <div style={{ width: 16, height: 1, background: C.gold }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <div style={{ width: 20, height: 1, background: C.onDarkSoft }} />
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                <path
+                  d="M1 5h8m0 0L5 1m4 4L5 9"
+                  stroke={C.onDarkSoft}
+                  strokeWidth="1"
+                  strokeLinecap="round"
+                />
+              </svg>
             </div>
-            <span style={{ fontSize: 12, color: C.cream, fontWeight: 600 }}>
+            <span
+              style={{
+                fontSize: 13,
+                color: C.onDark,
+                fontWeight: 500,
+                letterSpacing: '-0.01em',
+              }}
+            >
               {profile.target_major}
             </span>
           </div>
-          {/* 점수 */}
+          {/* 점수 — 디스플레이 메가(300) */}
           <div style={{ textAlign: 'center' }}>
             <p
               style={{
-                fontSize: 9,
-                color: `${C.cream}50`,
+                fontSize: 11,
+                color: C.onDarkSoft,
                 letterSpacing: '0.24em',
                 textTransform: 'uppercase',
-                margin: '0 0 6px',
+                margin: '0 0 12px',
+                fontWeight: 600,
               }}
             >
               Transferability Score
             </p>
             <div
               style={{
-                fontSize: 96,
-                fontWeight: 800,
-                color: C.cream,
+                fontSize: 120,
+                fontWeight: 300,
+                color: C.onDark,
                 lineHeight: 1,
-                marginBottom: 6,
+                marginBottom: 12,
                 letterSpacing: '-0.04em',
               }}
             >
               {sc}
               <span
                 style={{
-                  fontSize: 28,
+                  fontSize: 32,
                   fontWeight: 300,
-                  color: C.gold,
-                  marginLeft: 6,
+                  color: C.onDarkSoft,
+                  marginLeft: 8,
+                  letterSpacing: '-0.02em',
                 }}
               >
                 /100
@@ -556,12 +606,12 @@ export default function ResultPage({ session, profile, pdfResult }) {
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 6,
-                padding: '5px 16px',
-                borderRadius: 99,
-                border: `1px solid ${scoreColor(sc)}50`,
-                background: `${scoreColor(sc)}15`,
-                marginBottom: 18,
+                gap: 8,
+                padding: '6px 16px',
+                borderRadius: 9999,
+                border: `1px solid rgba(255,255,255,0.15)`,
+                background: 'rgba(255,255,255,0.04)',
+                marginBottom: 24,
               }}
             >
               <div
@@ -569,16 +619,15 @@ export default function ResultPage({ session, profile, pdfResult }) {
                   width: 6,
                   height: 6,
                   borderRadius: '50%',
-                  background: scoreColor(sc),
+                  background: scoreOrb(sc),
                 }}
               />
               <span
                 style={{
-                  fontSize: 11,
-                  color:
-                    scoreColor(sc) === C.greenMid ? C.goldLt : scoreColor(sc),
-                  fontWeight: 600,
-                  letterSpacing: '0.06em',
+                  fontSize: 12,
+                  color: C.onDark,
+                  fontWeight: 500,
+                  letterSpacing: '0.04em',
                 }}
               >
                 {scoreLabel(sc)}
@@ -586,11 +635,12 @@ export default function ResultPage({ session, profile, pdfResult }) {
             </div>
             <p
               style={{
-                fontSize: 13,
-                color: `${C.cream}80`,
-                lineHeight: 1.75,
-                maxWidth: 460,
+                fontSize: 15,
+                color: C.onDarkSoft,
+                lineHeight: 1.7,
+                maxWidth: 520,
                 margin: '0 auto',
+                letterSpacing: '0.01em',
               }}
             >
               {result.summary}
@@ -599,105 +649,93 @@ export default function ResultPage({ session, profile, pdfResult }) {
         </div>
       </div>
 
-      {/* ── 데이터 바 ───────────────────────── */}
+      {/* ── 데이터 바 — 라이트 ── */}
       {result.majorDetail &&
         (result.majorDetail.employment || result.majorDetail.salary) && (
-          <div style={{ background: C.gold, padding: '0 24px' }}>
+          <div
+            style={{
+              background: C.canvasSoft,
+              borderBottom: `1px solid ${C.hairline}`,
+              padding: '0 24px',
+            }}
+          >
             <div
               style={{
-                maxWidth: 640,
+                maxWidth: 720,
                 margin: '0 auto',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 28,
-                height: 52,
+                gap: 36,
+                height: 64,
               }}
             >
               <span
                 style={{
-                  fontSize: 9,
-                  color: C.green,
-                  fontWeight: 800,
-                  letterSpacing: '0.14em',
+                  fontSize: 10,
+                  color: C.muted,
+                  fontWeight: 600,
+                  letterSpacing: '0.16em',
                   textTransform: 'uppercase',
-                  opacity: 0.7,
                 }}
               >
                 커리어넷 공식
               </span>
               {result.majorDetail.employment && (
                 <div
-                  style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}
+                  style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}
                 >
                   <span
                     style={{
-                      fontSize: 24,
-                      fontWeight: 800,
-                      color: C.green,
-                      letterSpacing: '-0.02em',
+                      fontSize: 28,
+                      fontWeight: 300,
+                      color: C.ink,
+                      letterSpacing: '-0.03em',
                     }}
                   >
                     {parseEmployment(result.majorDetail.employment)}
                   </span>
-                  <span
-                    style={{
-                      fontSize: 10,
-                      color: `${C.green}70`,
-                      letterSpacing: '0.06em',
-                    }}
-                  >
-                    취업률
-                  </span>
+                  <span style={{ fontSize: 11, color: C.muted }}>취업률</span>
                 </div>
               )}
               {result.majorDetail.employment && result.majorDetail.salary && (
-                <div
-                  style={{ width: 1, height: 24, background: `${C.green}25` }}
-                />
+                <div style={{ width: 1, height: 24, background: C.hairline }} />
               )}
               {result.majorDetail.salary && (
                 <div
-                  style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}
+                  style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}
                 >
                   <span
                     style={{
-                      fontSize: 24,
-                      fontWeight: 800,
-                      color: C.green,
-                      letterSpacing: '-0.02em',
+                      fontSize: 28,
+                      fontWeight: 300,
+                      color: C.ink,
+                      letterSpacing: '-0.03em',
                     }}
                   >
                     {result.majorDetail.salary}
                   </span>
-                  <span
-                    style={{
-                      fontSize: 10,
-                      color: `${C.green}70`,
-                      letterSpacing: '0.06em',
-                    }}
-                  >
-                    초임
-                  </span>
+                  <span style={{ fontSize: 11, color: C.muted }}>초임</span>
                 </div>
               )}
             </div>
           </div>
         )}
 
-      {/* ── 탭 ─────────────────────────────── */}
+      {/* ── 탭 ── */}
       <div
         style={{
-          background: C.surface,
-          borderBottom: `1px solid ${C.border}`,
+          background: C.canvas,
+          borderBottom: `1px solid ${C.hairline}`,
           position: 'sticky',
-          top: 56,
+          top: 64,
           zIndex: 90,
         }}
       >
         <div
+          className="tab-scroll"
           style={{
-            maxWidth: 640,
+            maxWidth: 720,
             margin: '0 auto',
             display: 'flex',
             overflowX: 'auto',
@@ -709,15 +747,14 @@ export default function ResultPage({ session, profile, pdfResult }) {
               onClick={() => setActiveTab(key)}
               style={{
                 flex: '0 0 auto',
-                padding: '14px 16px',
-                fontSize: 11,
-                fontWeight: activeTab === key ? 700 : 400,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
+                padding: '18px 20px',
+                fontSize: 13,
+                fontWeight: activeTab === key ? 500 : 400,
+                letterSpacing: '0.01em',
                 background: 'transparent',
-                color: activeTab === key ? C.green : C.textMuted,
+                color: activeTab === key ? C.ink : C.muted,
                 border: 'none',
-                borderBottom: `2px solid ${activeTab === key ? C.green : 'transparent'}`,
+                borderBottom: `1.5px solid ${activeTab === key ? C.ink : 'transparent'}`,
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
                 transition: 'all 0.15s',
@@ -729,9 +766,13 @@ export default function ResultPage({ session, profile, pdfResult }) {
         </div>
       </div>
 
-      {/* ── 탭 콘텐츠 ──────────────────────── */}
+      {/* ── 탭 콘텐츠 ── */}
       <div
-        style={{ maxWidth: 640, margin: '0 auto', padding: '24px 16px 60px' }}
+        style={{
+          maxWidth: 720,
+          margin: '0 auto',
+          padding: '32px 16px 80px',
+        }}
       >
         {/* ════════ TAB: 역량 분석 ════════ */}
         {activeTab === 'gap' && (
@@ -744,27 +785,39 @@ export default function ResultPage({ session, profile, pdfResult }) {
                   style={{
                     display: 'flex',
                     justifyContent: 'center',
-                    gap: 24,
-                    marginTop: 16,
+                    gap: 28,
+                    marginTop: 20,
                   }}
                 >
                   {[
-                    { color: C.gold, label: '현재 역량' },
-                    { color: C.green, label: '목표 수준' },
+                    { color: C.primary, label: '현재 역량', dashed: false },
+                    { color: C.ink, label: '목표 수준', dashed: true },
                   ].map((it) => (
                     <div
                       key={it.label}
-                      style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                      }}
                     >
                       <div
                         style={{
-                          width: 18,
+                          width: 20,
                           height: 2,
-                          background: it.color,
+                          background: it.dashed
+                            ? `repeating-linear-gradient(90deg, ${it.color}, ${it.color} 3px, transparent 3px, transparent 6px)`
+                            : it.color,
                           borderRadius: 1,
                         }}
                       />
-                      <span style={{ fontSize: 11, color: C.textSub }}>
+                      <span
+                        style={{
+                          fontSize: 12,
+                          color: C.body,
+                          letterSpacing: '0.01em',
+                        }}
+                      >
                         {it.label}
                       </span>
                     </div>
@@ -775,12 +828,12 @@ export default function ResultPage({ session, profile, pdfResult }) {
 
             {result.strongPoints?.length > 0 && (
               <div style={card}>
-                <p style={{ ...sectionTitle, color: C.greenMid }}>강점 역량</p>
+                <p style={sectionTitle}>강점 역량</p>
                 {result.strongPoints.map((s, i) => (
                   <div
                     key={i}
                     style={{
-                      marginBottom: i < result.strongPoints.length - 1 ? 20 : 0,
+                      marginBottom: i < result.strongPoints.length - 1 ? 24 : 0,
                     }}
                   >
                     <div
@@ -788,19 +841,25 @@ export default function ResultPage({ session, profile, pdfResult }) {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        marginBottom: 8,
+                        marginBottom: 10,
                       }}
                     >
                       <span
-                        style={{ fontSize: 14, fontWeight: 600, color: C.text }}
+                        style={{
+                          fontSize: 15,
+                          fontWeight: 500,
+                          color: C.ink,
+                          letterSpacing: '-0.01em',
+                        }}
                       >
                         {s.skill}
                       </span>
                       <span
                         style={{
-                          fontSize: 13,
-                          fontWeight: 700,
-                          color: C.greenMid,
+                          fontSize: 14,
+                          fontWeight: 500,
+                          color: C.ink,
+                          letterSpacing: '-0.01em',
                         }}
                       >
                         {s.percent}%
@@ -808,10 +867,10 @@ export default function ResultPage({ session, profile, pdfResult }) {
                     </div>
                     <div
                       style={{
-                        height: 3,
-                        background: C.border,
+                        height: 4,
+                        background: C.hairline,
                         borderRadius: 2,
-                        marginBottom: 8,
+                        marginBottom: 10,
                         overflow: 'hidden',
                       }}
                     >
@@ -819,17 +878,18 @@ export default function ResultPage({ session, profile, pdfResult }) {
                         style={{
                           height: '100%',
                           width: `${s.percent}%`,
-                          background: `linear-gradient(90deg, ${C.greenMid}, ${C.greenLt})`,
+                          background: `linear-gradient(90deg, ${C.gMint}, ${C.gSky})`,
                           borderRadius: 2,
                         }}
                       />
                     </div>
                     <p
                       style={{
-                        fontSize: 12,
-                        color: C.textSub,
+                        fontSize: 13,
+                        color: C.body,
                         margin: 0,
-                        lineHeight: 1.75,
+                        lineHeight: 1.7,
+                        letterSpacing: '0.01em',
                       }}
                     >
                       {s.reason}
@@ -841,14 +901,12 @@ export default function ResultPage({ session, profile, pdfResult }) {
 
             {result.weakPoints?.length > 0 && (
               <div style={card}>
-                <p style={{ ...sectionTitle, color: C.danger }}>
-                  보완 필요 역량
-                </p>
+                <p style={sectionTitle}>보완 필요 역량</p>
                 {result.weakPoints.map((w, i) => (
                   <div
                     key={i}
                     style={{
-                      marginBottom: i < result.weakPoints.length - 1 ? 20 : 0,
+                      marginBottom: i < result.weakPoints.length - 1 ? 24 : 0,
                     }}
                   >
                     <div
@@ -856,25 +914,36 @@ export default function ResultPage({ session, profile, pdfResult }) {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        marginBottom: 8,
+                        marginBottom: 10,
                       }}
                     >
                       <span
-                        style={{ fontSize: 14, fontWeight: 600, color: C.text }}
+                        style={{
+                          fontSize: 15,
+                          fontWeight: 500,
+                          color: C.ink,
+                          letterSpacing: '-0.01em',
+                        }}
                       >
                         {w.skill}
                       </span>
-                      <span style={{ fontSize: 11, color: C.textMuted }}>
-                        현재 <b style={{ color: C.danger }}>{w.current}%</b> →
-                        목표 <b style={{ color: C.greenMid }}>{w.required}%</b>
+                      <span style={{ fontSize: 12, color: C.muted }}>
+                        현재{' '}
+                        <span style={{ color: C.ink, fontWeight: 500 }}>
+                          {w.current}%
+                        </span>{' '}
+                        → 목표{' '}
+                        <span style={{ color: C.ink, fontWeight: 500 }}>
+                          {w.required}%
+                        </span>
                       </span>
                     </div>
                     <div
                       style={{
-                        height: 3,
-                        background: C.border,
+                        height: 4,
+                        background: C.hairline,
                         borderRadius: 2,
-                        marginBottom: 8,
+                        marginBottom: 10,
                         position: 'relative',
                         overflow: 'hidden',
                       }}
@@ -884,7 +953,7 @@ export default function ResultPage({ session, profile, pdfResult }) {
                           position: 'absolute',
                           height: '100%',
                           width: `${w.required}%`,
-                          background: `${C.greenMid}20`,
+                          background: `${C.ink}15`,
                           borderRadius: 2,
                         }}
                       />
@@ -893,17 +962,18 @@ export default function ResultPage({ session, profile, pdfResult }) {
                           position: 'absolute',
                           height: '100%',
                           width: `${w.current}%`,
-                          background: `linear-gradient(90deg, ${C.danger}, #C45050)`,
+                          background: `linear-gradient(90deg, ${C.gRose}, ${C.gPeach})`,
                           borderRadius: 2,
                         }}
                       />
                     </div>
                     <p
                       style={{
-                        fontSize: 12,
-                        color: C.textSub,
+                        fontSize: 13,
+                        color: C.body,
                         margin: 0,
-                        lineHeight: 1.75,
+                        lineHeight: 1.7,
+                        letterSpacing: '0.01em',
                       }}
                     >
                       {w.reason}
@@ -918,10 +988,10 @@ export default function ResultPage({ session, profile, pdfResult }) {
                 <p style={sectionTitle}>전환 방법 비교</p>
                 <p
                   style={{
-                    fontSize: 11,
-                    color: C.textMuted,
-                    margin: '-8px 0 14px',
-                    letterSpacing: '0.02em',
+                    fontSize: 13,
+                    color: C.muted,
+                    margin: '-10px 0 18px',
+                    letterSpacing: '0.01em',
                   }}
                 >
                   방법을 선택하면 맞춤 로드맵이 생성됩니다
@@ -929,15 +999,15 @@ export default function ResultPage({ session, profile, pdfResult }) {
                 <div
                   style={{
                     display: 'inline-block',
-                    fontSize: 9,
-                    fontWeight: 700,
-                    color: C.greenMid,
-                    background: `${C.greenMid}12`,
-                    borderRadius: 4,
-                    padding: '3px 10px',
-                    letterSpacing: '0.12em',
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: C.ink,
+                    background: C.surfaceStrong,
+                    borderRadius: 9999,
+                    padding: '4px 12px',
+                    letterSpacing: '0.08em',
                     textTransform: 'uppercase',
-                    marginBottom: 12,
+                    marginBottom: 14,
                   }}
                 >
                   재학 중 전환
@@ -960,19 +1030,19 @@ export default function ResultPage({ session, profile, pdfResult }) {
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    marginBottom: 4,
+                    marginBottom: 6,
                   }}
                 >
                   <p style={{ ...sectionTitle, margin: 0 }}>관련 부트캠프</p>
                   <span
                     style={{
-                      fontSize: 9,
-                      color: C.gold,
-                      fontWeight: 700,
-                      letterSpacing: '0.1em',
-                      background: `${C.gold}15`,
-                      padding: '3px 8px',
-                      borderRadius: 4,
+                      fontSize: 10,
+                      color: C.ink,
+                      fontWeight: 600,
+                      letterSpacing: '0.08em',
+                      background: C.surfaceStrong,
+                      padding: '4px 10px',
+                      borderRadius: 9999,
                     }}
                   >
                     국민내일배움카드
@@ -980,9 +1050,9 @@ export default function ResultPage({ session, profile, pdfResult }) {
                 </div>
                 <p
                   style={{
-                    fontSize: 11,
-                    color: C.textMuted,
-                    margin: '4px 0 16px',
+                    fontSize: 12,
+                    color: C.muted,
+                    margin: '6px 0 18px',
                   }}
                 >
                   {profile.target_major} 관련 국비지원 훈련과정
@@ -991,8 +1061,8 @@ export default function ResultPage({ session, profile, pdfResult }) {
                   <div
                     key={i}
                     style={{
-                      padding: '12px 0',
-                      borderBottom: i < 1 ? `1px solid ${C.border}` : 'none',
+                      padding: '14px 0',
+                      borderBottom: i < 1 ? `1px solid ${C.hairline}` : 'none',
                     }}
                   >
                     <div
@@ -1004,12 +1074,13 @@ export default function ResultPage({ session, profile, pdfResult }) {
                     >
                       <span
                         style={{
-                          fontSize: 13,
-                          fontWeight: 600,
-                          color: C.text,
+                          fontSize: 14,
+                          fontWeight: 500,
+                          color: C.ink,
                           flex: 1,
-                          marginRight: 8,
-                          lineHeight: 1.4,
+                          marginRight: 10,
+                          lineHeight: 1.45,
+                          letterSpacing: '-0.01em',
                         }}
                       >
                         {item.name}
@@ -1017,10 +1088,11 @@ export default function ResultPage({ session, profile, pdfResult }) {
                       {item.cost && (
                         <span
                           style={{
-                            fontSize: 12,
-                            color: C.gold,
-                            fontWeight: 700,
+                            fontSize: 13,
+                            color: C.ink,
+                            fontWeight: 500,
                             flexShrink: 0,
+                            letterSpacing: '-0.01em',
                           }}
                         >
                           {item.cost}
@@ -1030,9 +1102,9 @@ export default function ResultPage({ session, profile, pdfResult }) {
                     {item.institution && (
                       <p
                         style={{
-                          fontSize: 11,
-                          color: C.textMuted,
-                          margin: '4px 0 0',
+                          fontSize: 12,
+                          color: C.muted,
+                          margin: '6px 0 0',
                         }}
                       >
                         {item.institution}
@@ -1044,20 +1116,20 @@ export default function ResultPage({ session, profile, pdfResult }) {
                   onClick={() => setActiveTab('training')}
                   style={{
                     width: '100%',
-                    padding: '10px 0',
-                    borderRadius: 6,
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase',
+                    padding: '10px 20px',
+                    height: 40,
+                    borderRadius: 9999,
+                    fontSize: 13,
+                    fontWeight: 500,
+                    letterSpacing: '0.01em',
                     background: 'transparent',
-                    color: C.green,
-                    border: `1px solid ${C.green}`,
+                    color: C.ink,
+                    border: `1px solid ${C.hairlineStrong}`,
                     cursor: 'pointer',
-                    marginTop: 14,
+                    marginTop: 16,
                   }}
                 >
-                  전체 보기 ({result.trainingList.length}개) →
+                  전체 보기 ({result.trainingList.length}개)
                 </button>
               </div>
             )}
@@ -1068,19 +1140,19 @@ export default function ResultPage({ session, profile, pdfResult }) {
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  marginBottom: 4,
+                  marginBottom: 6,
                 }}
               >
                 <p style={{ ...sectionTitle, margin: 0 }}>관련 공모전</p>
                 <span
                   style={{
-                    fontSize: 9,
-                    color: C.gold,
-                    fontWeight: 700,
-                    letterSpacing: '0.1em',
-                    background: `${C.gold}15`,
-                    padding: '3px 8px',
-                    borderRadius: 4,
+                    fontSize: 10,
+                    color: C.ink,
+                    fontWeight: 600,
+                    letterSpacing: '0.08em',
+                    background: C.surfaceStrong,
+                    padding: '4px 10px',
+                    borderRadius: 9999,
                   }}
                 >
                   포트폴리오 강화
@@ -1088,9 +1160,9 @@ export default function ResultPage({ session, profile, pdfResult }) {
               </div>
               <p
                 style={{
-                  fontSize: 11,
-                  color: C.textMuted,
-                  margin: '4px 0 16px',
+                  fontSize: 12,
+                  color: C.muted,
+                  margin: '6px 0 18px',
                 }}
               >
                 {profile.target_major} 관련 공모전으로 경쟁력을 쌓아보세요
@@ -1100,8 +1172,8 @@ export default function ResultPage({ session, profile, pdfResult }) {
                   <div
                     key={i}
                     style={{
-                      padding: '12px 0',
-                      borderBottom: i < 1 ? `1px solid ${C.border}` : 'none',
+                      padding: '14px 0',
+                      borderBottom: i < 1 ? `1px solid ${C.hairline}` : 'none',
                     }}
                   >
                     <div
@@ -1113,24 +1185,26 @@ export default function ResultPage({ session, profile, pdfResult }) {
                     >
                       <span
                         style={{
-                          fontSize: 13,
-                          fontWeight: 600,
-                          color: C.text,
+                          fontSize: 14,
+                          fontWeight: 500,
+                          color: C.ink,
                           flex: 1,
-                          marginRight: 8,
+                          marginRight: 10,
+                          letterSpacing: '-0.01em',
                         }}
                       >
                         {c.name}
                       </span>
                       <span
                         style={{
-                          fontSize: 9,
-                          background: `${C.gold}15`,
-                          color: C.gold,
-                          padding: '2px 8px',
-                          borderRadius: 4,
+                          fontSize: 10,
+                          background: C.surfaceStrong,
+                          color: C.ink,
+                          padding: '3px 10px',
+                          borderRadius: 9999,
                           flexShrink: 0,
-                          fontWeight: 700,
+                          fontWeight: 500,
+                          letterSpacing: '0.02em',
                         }}
                       >
                         {c.category}
@@ -1138,10 +1212,10 @@ export default function ResultPage({ session, profile, pdfResult }) {
                     </div>
                     <p
                       style={{
-                        fontSize: 11,
-                        color: C.greenMid,
-                        fontWeight: 600,
-                        margin: '4px 0 0',
+                        fontSize: 12,
+                        color: C.body,
+                        fontWeight: 400,
+                        margin: '6px 0 0',
                       }}
                     >
                       {c.organizer}
@@ -1149,7 +1223,7 @@ export default function ResultPage({ session, profile, pdfResult }) {
                   </div>
                 ))
               ) : (
-                <p style={{ fontSize: 12, color: C.textMuted }}>
+                <p style={{ fontSize: 13, color: C.muted }}>
                   공모전 정보를 불러오는 중이에요
                 </p>
               )}
@@ -1158,23 +1232,23 @@ export default function ResultPage({ session, profile, pdfResult }) {
                   onClick={() => setActiveTab('contests')}
                   style={{
                     width: '100%',
-                    padding: '10px 0',
-                    borderRadius: 6,
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase',
+                    padding: '10px 20px',
+                    height: 40,
+                    borderRadius: 9999,
+                    fontSize: 13,
+                    fontWeight: 500,
+                    letterSpacing: '0.01em',
                     background: 'transparent',
-                    color: C.green,
-                    border: `1px solid ${C.green}`,
+                    color: C.ink,
+                    border: `1px solid ${C.hairlineStrong}`,
                     cursor: 'pointer',
-                    marginTop: 14,
+                    marginTop: 16,
                   }}
                 >
-                  전체 보기 →
+                  전체 보기
                 </button>
               )}
-              <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+              <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
                 <a
                   href={`https://www.wevity.com/?c=find&s=${encodeURIComponent(majorKeyword)}`}
                   target="_blank"
@@ -1182,14 +1256,15 @@ export default function ResultPage({ session, profile, pdfResult }) {
                   style={{
                     flex: 1,
                     textAlign: 'center',
-                    padding: '8px 0',
-                    borderRadius: 6,
-                    background: `${C.gold}15`,
-                    color: C.gold,
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: '0.06em',
+                    padding: '10px 0',
+                    borderRadius: 9999,
+                    background: C.surfaceStrong,
+                    color: C.ink,
+                    fontSize: 12,
+                    fontWeight: 500,
+                    letterSpacing: '0.01em',
                     textDecoration: 'none',
+                    border: `1px solid ${C.hairline}`,
                   }}
                 >
                   위비티 검색
@@ -1201,14 +1276,15 @@ export default function ResultPage({ session, profile, pdfResult }) {
                   style={{
                     flex: 1,
                     textAlign: 'center',
-                    padding: '8px 0',
-                    borderRadius: 6,
-                    background: `${C.greenMid}10`,
-                    color: C.greenMid,
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: '0.06em',
+                    padding: '10px 0',
+                    borderRadius: 9999,
+                    background: C.surfaceStrong,
+                    color: C.ink,
+                    fontSize: 12,
+                    fontWeight: 500,
+                    letterSpacing: '0.01em',
                     textDecoration: 'none',
+                    border: `1px solid ${C.hairline}`,
                   }}
                 >
                   씽굿 검색
@@ -1222,11 +1298,11 @@ export default function ResultPage({ session, profile, pdfResult }) {
         {activeTab === 'roadmap' && (
           <div style={{ animation: 'fadeUp 0.3s ease' }}>
             {result.transferRoutes && (
-              <div style={{ marginBottom: 24 }}>
-                <p style={{ ...sectionTitle, marginBottom: 10 }}>
+              <div style={{ marginBottom: 28 }}>
+                <p style={{ ...sectionTitle, marginBottom: 12 }}>
                   전환 방법 선택
                 </p>
-                <div style={{ display: 'flex', gap: 8 }}>
+                <div style={{ display: 'flex', gap: 10 }}>
                   {result.transferRoutes.map((r) => (
                     <button
                       key={r.type}
@@ -1234,14 +1310,15 @@ export default function ResultPage({ session, profile, pdfResult }) {
                       style={{
                         flex: 1,
                         padding: '12px 0',
-                        borderRadius: 8,
-                        fontSize: 12,
-                        fontWeight: 600,
-                        letterSpacing: '0.02em',
+                        height: 44,
+                        borderRadius: 9999,
+                        fontSize: 13,
+                        fontWeight: 500,
+                        letterSpacing: '0.01em',
                         background:
-                          selectedRoute === r.type ? C.green : C.surface,
-                        color: selectedRoute === r.type ? C.cream : C.textSub,
-                        border: `1px solid ${selectedRoute === r.type ? C.green : C.border}`,
+                          selectedRoute === r.type ? C.ink : C.surface,
+                        color: selectedRoute === r.type ? C.onDark : C.ink,
+                        border: `1px solid ${selectedRoute === r.type ? C.ink : C.hairlineStrong}`,
                         cursor: 'pointer',
                         transition: 'all 0.15s',
                       }}
@@ -1253,27 +1330,35 @@ export default function ResultPage({ session, profile, pdfResult }) {
               </div>
             )}
             {roadmapLoading && (
-              <div style={{ textAlign: 'center', padding: 48 }}>
+              <div style={{ textAlign: 'center', padding: 56 }}>
                 <div
                   style={{
-                    width: 36,
-                    height: 36,
-                    border: `2px solid ${C.border}`,
-                    borderTopColor: C.green,
+                    width: 32,
+                    height: 32,
+                    border: `1.5px solid ${C.hairline}`,
+                    borderTopColor: C.ink,
                     borderRadius: '50%',
                     animation: 'spin 1s linear infinite',
-                    margin: '0 auto 16px',
+                    margin: '0 auto 18px',
                   }}
                 />
-                <p style={{ color: C.green, fontSize: 13, fontWeight: 600 }}>
+                <p
+                  style={{
+                    color: C.ink,
+                    fontSize: 14,
+                    fontWeight: 500,
+                    letterSpacing: '0.01em',
+                  }}
+                >
                   맞춤 로드맵 생성 중...
                 </p>
                 <p
                   style={{
-                    color: C.textMuted,
-                    fontSize: 10,
-                    letterSpacing: '0.1em',
+                    color: C.muted,
+                    fontSize: 11,
+                    letterSpacing: '0.16em',
                     textTransform: 'uppercase',
+                    marginTop: 6,
                   }}
                 >
                   실제 준비 절차 기반
@@ -1284,7 +1369,7 @@ export default function ResultPage({ session, profile, pdfResult }) {
               currentRoadmapSteps.map((step, i) => (
                 <div
                   key={i}
-                  style={{ display: 'flex', gap: 16, marginBottom: 20 }}
+                  style={{ display: 'flex', gap: 20, marginBottom: 24 }}
                 >
                   <div
                     style={{
@@ -1299,15 +1384,16 @@ export default function ResultPage({ session, profile, pdfResult }) {
                         width: 40,
                         height: 40,
                         borderRadius: '50%',
-                        background: i === 0 ? C.green : C.surface,
-                        border: `2px solid ${i === 0 ? C.green : C.border}`,
+                        background: i === 0 ? C.ink : C.surface,
+                        border: `1px solid ${i === 0 ? C.ink : C.hairlineStrong}`,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: i === 0 ? C.cream : C.textMuted,
-                        fontWeight: 700,
+                        color: i === 0 ? C.onDark : C.ink,
+                        fontWeight: 500,
                         fontSize: 14,
                         flexShrink: 0,
+                        letterSpacing: '-0.01em',
                       }}
                     >
                       {i + 1}
@@ -1317,9 +1403,9 @@ export default function ResultPage({ session, profile, pdfResult }) {
                         style={{
                           width: 1,
                           flex: 1,
-                          background: C.border,
-                          marginTop: 4,
-                          minHeight: 20,
+                          background: C.hairline,
+                          marginTop: 6,
+                          minHeight: 24,
                         }}
                       />
                     )}
@@ -1328,29 +1414,30 @@ export default function ResultPage({ session, profile, pdfResult }) {
                     style={{
                       flex: 1,
                       background: C.surface,
-                      border: `1px solid ${C.border}`,
-                      borderRadius: 10,
-                      padding: '16px 20px',
+                      border: `1px solid ${C.hairline}`,
+                      borderRadius: 16,
+                      padding: '20px 24px',
                     }}
                   >
                     <p
                       style={{
-                        fontSize: 9,
-                        color: C.gold,
-                        fontWeight: 700,
+                        fontSize: 11,
+                        color: C.muted,
+                        fontWeight: 600,
                         letterSpacing: '0.16em',
                         textTransform: 'uppercase',
-                        margin: '0 0 4px',
+                        margin: '0 0 6px',
                       }}
                     >
                       {step.period}
                     </p>
                     <p
                       style={{
-                        fontSize: 15,
-                        fontWeight: 700,
-                        color: C.text,
-                        margin: '0 0 12px',
+                        fontSize: 17,
+                        fontWeight: 500,
+                        color: C.ink,
+                        margin: '0 0 14px',
+                        letterSpacing: '-0.01em',
                       }}
                     >
                       {step.title}
@@ -1358,23 +1445,28 @@ export default function ResultPage({ session, profile, pdfResult }) {
                     {(step.actions || []).map((action, j) => (
                       <div
                         key={j}
-                        style={{ display: 'flex', gap: 10, marginBottom: 6 }}
+                        style={{
+                          display: 'flex',
+                          gap: 12,
+                          marginBottom: 8,
+                        }}
                       >
                         <span
                           style={{
-                            color: C.gold,
-                            fontSize: 12,
+                            color: C.muted,
+                            fontSize: 14,
                             flexShrink: 0,
-                            marginTop: 2,
+                            marginTop: 1,
                           }}
                         >
-                          ▸
+                          ·
                         </span>
                         <span
                           style={{
-                            fontSize: 13,
-                            color: C.textSub,
+                            fontSize: 14,
+                            color: C.body,
                             lineHeight: 1.65,
+                            letterSpacing: '0.01em',
                           }}
                         >
                           {action}
@@ -1384,16 +1476,19 @@ export default function ResultPage({ session, profile, pdfResult }) {
                     {step.checkpoint && (
                       <div
                         style={{
-                          marginTop: 12,
-                          padding: '8px 14px',
-                          background: `${C.green}08`,
-                          border: `1px solid ${C.green}18`,
-                          borderRadius: 6,
-                          fontSize: 12,
-                          color: C.greenMid,
+                          marginTop: 14,
+                          padding: '10px 14px',
+                          background: C.canvasSoft,
+                          border: `1px solid ${C.hairline}`,
+                          borderRadius: 12,
+                          fontSize: 13,
+                          color: C.body,
+                          letterSpacing: '0.01em',
                         }}
                       >
-                        <span style={{ fontWeight: 700 }}>완료 기준: </span>
+                        <span style={{ fontWeight: 500, color: C.ink }}>
+                          완료 기준:{' '}
+                        </span>
                         {step.checkpoint}
                       </div>
                     )}
@@ -1402,15 +1497,19 @@ export default function ResultPage({ session, profile, pdfResult }) {
               ))}
             {!roadmapLoading && currentRoadmapSteps.length === 0 && (
               <div
-                style={{ textAlign: 'center', padding: 48, color: C.textMuted }}
+                style={{
+                  textAlign: 'center',
+                  padding: 56,
+                  color: C.muted,
+                }}
               >
-                <p style={{ fontSize: 13 }}>위에서 전환 방법을 선택하면</p>
+                <p style={{ fontSize: 14 }}>위에서 전환 방법을 선택하면</p>
                 <p
                   style={{
-                    fontSize: 10,
-                    letterSpacing: '0.1em',
+                    fontSize: 11,
+                    letterSpacing: '0.16em',
                     textTransform: 'uppercase',
-                    marginTop: 4,
+                    marginTop: 6,
                   }}
                 >
                   맞춤 로드맵이 생성됩니다
@@ -1426,12 +1525,13 @@ export default function ResultPage({ session, profile, pdfResult }) {
                       key={i}
                       style={{
                         padding: '6px 14px',
-                        borderRadius: 6,
-                        fontSize: 12,
-                        fontWeight: 500,
-                        background: `${C.green}08`,
-                        color: C.greenMid,
-                        border: `1px solid ${C.green}18`,
+                        borderRadius: 9999,
+                        fontSize: 13,
+                        fontWeight: 400,
+                        background: C.surfaceStrong,
+                        color: C.ink,
+                        border: `1px solid ${C.hairline}`,
+                        letterSpacing: '0.01em',
                       }}
                     >
                       {cert}
@@ -1454,24 +1554,30 @@ export default function ResultPage({ session, profile, pdfResult }) {
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'flex-start',
-                      marginBottom: 8,
+                      marginBottom: 10,
                     }}
                   >
                     <span
-                      style={{ fontSize: 16, fontWeight: 700, color: C.text }}
+                      style={{
+                        fontSize: 18,
+                        fontWeight: 500,
+                        color: C.ink,
+                        letterSpacing: '-0.01em',
+                      }}
                     >
                       {job.name}
                     </span>
                     {job.wage && (
                       <span
                         style={{
-                          fontSize: 12,
-                          color: C.gold,
-                          fontWeight: 600,
-                          background: `${C.gold}15`,
-                          padding: '3px 10px',
-                          borderRadius: 4,
+                          fontSize: 13,
+                          color: C.ink,
+                          fontWeight: 500,
+                          background: C.surfaceStrong,
+                          padding: '4px 12px',
+                          borderRadius: 9999,
                           flexShrink: 0,
+                          letterSpacing: '-0.01em',
                         }}
                       >
                         {job.wage}
@@ -1480,10 +1586,11 @@ export default function ResultPage({ session, profile, pdfResult }) {
                   </div>
                   <p
                     style={{
-                      fontSize: 13,
-                      color: C.textSub,
-                      margin: '0 0 10px',
-                      lineHeight: 1.75,
+                      fontSize: 14,
+                      color: C.body,
+                      margin: '0 0 12px',
+                      lineHeight: 1.7,
+                      letterSpacing: '0.01em',
                     }}
                   >
                     {job.work}
@@ -1491,13 +1598,13 @@ export default function ResultPage({ session, profile, pdfResult }) {
                   {job.wlb && (
                     <span
                       style={{
-                        fontSize: 10,
-                        color: C.greenMid,
-                        background: `${C.greenMid}10`,
-                        padding: '2px 10px',
-                        borderRadius: 4,
-                        fontWeight: 600,
-                        letterSpacing: '0.04em',
+                        fontSize: 11,
+                        color: C.ink,
+                        background: C.surfaceStrong,
+                        padding: '4px 12px',
+                        borderRadius: 9999,
+                        fontWeight: 500,
+                        letterSpacing: '0.02em',
                       }}
                     >
                       워라밸 {job.wlb}
@@ -1506,9 +1613,7 @@ export default function ResultPage({ session, profile, pdfResult }) {
                 </div>
               ))
             ) : (
-              <div
-                style={{ textAlign: 'center', padding: 48, color: C.textMuted }}
-              >
+              <div style={{ textAlign: 'center', padding: 56, color: C.muted }}>
                 <p>관련 직업 정보를 불러올 수 없어요</p>
               </div>
             )}
@@ -1519,20 +1624,21 @@ export default function ResultPage({ session, profile, pdfResult }) {
               style={{
                 display: 'block',
                 textAlign: 'center',
-                padding: 14,
-                borderRadius: 8,
+                padding: '12px 24px',
+                height: 44,
+                lineHeight: '20px',
+                borderRadius: 9999,
                 background: 'transparent',
-                border: `1px solid ${C.green}`,
-                color: C.green,
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
+                border: `1px solid ${C.hairlineStrong}`,
+                color: C.ink,
+                fontSize: 13,
+                fontWeight: 500,
+                letterSpacing: '0.01em',
                 textDecoration: 'none',
                 marginTop: 8,
               }}
             >
-              커리어넷에서 더 탐색하기 →
+              커리어넷에서 더 탐색하기
             </a>
           </div>
         )}
@@ -1540,7 +1646,7 @@ export default function ResultPage({ session, profile, pdfResult }) {
         {/* ════════ TAB: 채용공고 ════════ */}
         {activeTab === 'recruit' && (
           <div style={{ animation: 'fadeUp 0.3s ease' }}>
-            <p style={{ ...sectionTitle, marginBottom: 16 }}>
+            <p style={{ ...sectionTitle, marginBottom: 18 }}>
               워크넷 실시간 채용공고
             </p>
             {result.recruitList?.length > 0 ? (
@@ -1548,20 +1654,22 @@ export default function ResultPage({ session, profile, pdfResult }) {
                 <div key={i} style={card}>
                   <p
                     style={{
-                      fontSize: 15,
-                      fontWeight: 700,
-                      color: C.text,
-                      margin: '0 0 4px',
+                      fontSize: 16,
+                      fontWeight: 500,
+                      color: C.ink,
+                      margin: '0 0 6px',
+                      letterSpacing: '-0.01em',
                     }}
                   >
                     {item.title}
                   </p>
                   <p
                     style={{
-                      fontSize: 13,
-                      color: C.greenMid,
-                      fontWeight: 600,
-                      margin: '0 0 12px',
+                      fontSize: 14,
+                      color: C.body,
+                      fontWeight: 400,
+                      margin: '0 0 14px',
+                      letterSpacing: '0.01em',
                     }}
                   >
                     {item.company}
@@ -1571,18 +1679,18 @@ export default function ResultPage({ session, profile, pdfResult }) {
                       display: 'flex',
                       gap: 6,
                       flexWrap: 'wrap',
-                      marginBottom: 12,
+                      marginBottom: 14,
                     }}
                   >
                     {item.region && (
                       <span
                         style={{
                           fontSize: 11,
-                          background: C.bg,
-                          color: C.textSub,
-                          padding: '2px 8px',
-                          borderRadius: 4,
-                          border: `1px solid ${C.border}`,
+                          background: C.surfaceStrong,
+                          color: C.ink,
+                          padding: '4px 10px',
+                          borderRadius: 9999,
+                          letterSpacing: '0.01em',
                         }}
                       >
                         {item.region}
@@ -1592,10 +1700,11 @@ export default function ResultPage({ session, profile, pdfResult }) {
                       <span
                         style={{
                           fontSize: 11,
-                          background: `${C.greenMid}10`,
-                          color: C.greenMid,
-                          padding: '2px 8px',
-                          borderRadius: 4,
+                          background: C.surfaceStrong,
+                          color: C.ink,
+                          padding: '4px 10px',
+                          borderRadius: 9999,
+                          letterSpacing: '0.01em',
                         }}
                       >
                         {item.jobType}
@@ -1605,11 +1714,12 @@ export default function ResultPage({ session, profile, pdfResult }) {
                       <span
                         style={{
                           fontSize: 11,
-                          background: `${C.gold}15`,
-                          color: C.gold,
-                          padding: '2px 8px',
-                          borderRadius: 4,
-                          fontWeight: 600,
+                          background: C.surfaceStrong,
+                          color: C.ink,
+                          padding: '4px 10px',
+                          borderRadius: 9999,
+                          fontWeight: 500,
+                          letterSpacing: '0.01em',
                         }}
                       >
                         {item.salary}
@@ -1623,7 +1733,7 @@ export default function ResultPage({ session, profile, pdfResult }) {
                       alignItems: 'center',
                     }}
                   >
-                    <span style={{ fontSize: 11, color: C.textMuted }}>
+                    <span style={{ fontSize: 12, color: C.muted }}>
                       마감: {item.endDate || '상시채용'}
                     </span>
                     {item.url && (
@@ -1632,23 +1742,22 @@ export default function ResultPage({ session, profile, pdfResult }) {
                         target="_blank"
                         rel="noreferrer"
                         style={{
-                          fontSize: 12,
-                          color: C.green,
-                          fontWeight: 700,
-                          textDecoration: 'none',
-                          letterSpacing: '0.04em',
+                          fontSize: 13,
+                          color: C.ink,
+                          fontWeight: 500,
+                          textDecoration: 'underline',
+                          textUnderlineOffset: 3,
+                          letterSpacing: '0.01em',
                         }}
                       >
-                        공고 보기 →
+                        공고 보기
                       </a>
                     )}
                   </div>
                 </div>
               ))
             ) : (
-              <div
-                style={{ textAlign: 'center', padding: 48, color: C.textMuted }}
-              >
+              <div style={{ textAlign: 'center', padding: 56, color: C.muted }}>
                 <p>현재 관련 채용공고가 없습니다</p>
               </div>
             )}
@@ -1658,7 +1767,7 @@ export default function ResultPage({ session, profile, pdfResult }) {
         {/* ════════ TAB: 부트캠프 ════════ */}
         {activeTab === 'training' && (
           <div style={{ animation: 'fadeUp 0.3s ease' }}>
-            <p style={{ ...sectionTitle, marginBottom: 16 }}>
+            <p style={{ ...sectionTitle, marginBottom: 18 }}>
               국민내일배움카드 부트캠프 · 훈련과정
             </p>
             {result.trainingList?.length > 0 ? (
@@ -1673,12 +1782,13 @@ export default function ResultPage({ session, profile, pdfResult }) {
                   }}
                   onMouseEnter={(e) => {
                     if (item.url) {
-                      e.currentTarget.style.borderColor = C.green;
-                      e.currentTarget.style.boxShadow = `0 4px 20px ${C.green}12`;
+                      e.currentTarget.style.borderColor = C.ink;
+                      e.currentTarget.style.boxShadow =
+                        '0 4px 16px rgba(0,0,0,0.04)';
                     }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = C.border;
+                    e.currentTarget.style.borderColor = C.hairline;
                     e.currentTarget.style.boxShadow = 'none';
                   }}
                 >
@@ -1687,17 +1797,18 @@ export default function ResultPage({ session, profile, pdfResult }) {
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'flex-start',
-                      marginBottom: 6,
+                      marginBottom: 8,
                     }}
                   >
                     <span
                       style={{
-                        fontSize: 14,
-                        fontWeight: 700,
-                        color: C.text,
+                        fontSize: 15,
+                        fontWeight: 500,
+                        color: C.ink,
                         flex: 1,
-                        marginRight: 12,
-                        lineHeight: 1.4,
+                        marginRight: 14,
+                        lineHeight: 1.45,
+                        letterSpacing: '-0.01em',
                       }}
                     >
                       {item.name}
@@ -1706,32 +1817,31 @@ export default function ResultPage({ session, profile, pdfResult }) {
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 8,
+                        gap: 10,
                         flexShrink: 0,
                       }}
                     >
                       {item.cost && (
                         <span
                           style={{
-                            fontSize: 12,
-                            color: C.gold,
-                            fontWeight: 700,
+                            fontSize: 13,
+                            color: C.ink,
+                            fontWeight: 500,
+                            letterSpacing: '-0.01em',
                           }}
                         >
                           {item.cost}
                         </span>
-                      )}
-                      {item.url && (
-                        <span style={{ fontSize: 11, color: C.green }}>→</span>
                       )}
                     </div>
                   </div>
                   {item.institution && (
                     <p
                       style={{
-                        fontSize: 12,
-                        color: C.textSub,
-                        margin: '0 0 8px',
+                        fontSize: 13,
+                        color: C.body,
+                        margin: '0 0 10px',
+                        letterSpacing: '0.01em',
                       }}
                     >
                       {item.institution}
@@ -1740,12 +1850,13 @@ export default function ResultPage({ session, profile, pdfResult }) {
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                     <span
                       style={{
-                        fontSize: 10,
-                        background: `${C.gold}15`,
-                        color: C.gold,
-                        padding: '2px 8px',
-                        borderRadius: 4,
-                        fontWeight: 700,
+                        fontSize: 11,
+                        background: C.surfaceStrong,
+                        color: C.ink,
+                        padding: '4px 10px',
+                        borderRadius: 9999,
+                        fontWeight: 500,
+                        letterSpacing: '0.02em',
                       }}
                     >
                       {item.subsidy}
@@ -1753,18 +1864,26 @@ export default function ResultPage({ session, profile, pdfResult }) {
                     {item.rating && (
                       <span
                         style={{
-                          fontSize: 10,
-                          background: `${C.greenMid}10`,
-                          color: C.greenMid,
-                          padding: '2px 8px',
-                          borderRadius: 4,
+                          fontSize: 11,
+                          background: C.surfaceStrong,
+                          color: C.ink,
+                          padding: '4px 10px',
+                          borderRadius: 9999,
+                          letterSpacing: '0.01em',
                         }}
                       >
                         {item.rating}
                       </span>
                     )}
                     {item.period && (
-                      <span style={{ fontSize: 10, color: C.textMuted }}>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          color: C.muted,
+                          padding: '4px 0',
+                          letterSpacing: '0.01em',
+                        }}
+                      >
                         {item.period}
                       </span>
                     )}
@@ -1772,9 +1891,7 @@ export default function ResultPage({ session, profile, pdfResult }) {
                 </div>
               ))
             ) : (
-              <div
-                style={{ textAlign: 'center', padding: 48, color: C.textMuted }}
-              >
+              <div style={{ textAlign: 'center', padding: 56, color: C.muted }}>
                 <p>현재 관련 훈련과정이 없습니다</p>
               </div>
             )}
@@ -1785,20 +1902,21 @@ export default function ResultPage({ session, profile, pdfResult }) {
               style={{
                 display: 'block',
                 textAlign: 'center',
-                padding: 14,
-                borderRadius: 8,
+                padding: '12px 24px',
+                height: 44,
+                lineHeight: '20px',
+                borderRadius: 9999,
                 background: 'transparent',
-                border: `1px solid ${C.green}`,
-                color: C.green,
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
+                border: `1px solid ${C.hairlineStrong}`,
+                color: C.ink,
+                fontSize: 13,
+                fontWeight: 500,
+                letterSpacing: '0.01em',
                 textDecoration: 'none',
                 marginTop: 8,
               }}
             >
-              HRD-Net에서 더 보기 →
+              HRD-Net에서 더 보기
             </a>
           </div>
         )}
@@ -1806,8 +1924,15 @@ export default function ResultPage({ session, profile, pdfResult }) {
         {/* ════════ TAB: 공모전 ════════ */}
         {activeTab === 'contests' && (
           <div style={{ animation: 'fadeUp 0.3s ease' }}>
-            <p style={{ ...sectionTitle, marginBottom: 4 }}>관련 공모전</p>
-            <p style={{ fontSize: 11, color: C.textMuted, marginBottom: 20 }}>
+            <p style={{ ...sectionTitle, marginBottom: 6 }}>관련 공모전</p>
+            <p
+              style={{
+                fontSize: 12,
+                color: C.muted,
+                marginBottom: 24,
+                letterSpacing: '0.01em',
+              }}
+            >
               {profile.target_major} 관련 공모전 — 클릭하면 위비티에서 관련
               공모전을 검색합니다
             </p>
@@ -1824,11 +1949,12 @@ export default function ResultPage({ session, profile, pdfResult }) {
                       transition: 'border-color 0.15s, box-shadow 0.15s',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = C.gold;
-                      e.currentTarget.style.boxShadow = `0 4px 20px ${C.gold}18`;
+                      e.currentTarget.style.borderColor = C.ink;
+                      e.currentTarget.style.boxShadow =
+                        '0 4px 16px rgba(0,0,0,0.04)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = C.border;
+                      e.currentTarget.style.borderColor = C.hairline;
                       e.currentTarget.style.boxShadow = 'none';
                     }}
                   >
@@ -1837,52 +1963,44 @@ export default function ResultPage({ session, profile, pdfResult }) {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'flex-start',
-                        marginBottom: 8,
+                        marginBottom: 10,
                       }}
                     >
                       <span
                         style={{
-                          fontSize: 14,
-                          fontWeight: 700,
-                          color: C.text,
+                          fontSize: 15,
+                          fontWeight: 500,
+                          color: C.ink,
                           flex: 1,
-                          marginRight: 12,
-                          lineHeight: 1.4,
+                          marginRight: 14,
+                          lineHeight: 1.45,
+                          letterSpacing: '-0.01em',
                         }}
                       >
                         {c.name}
                       </span>
-                      <div
+                      <span
                         style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 6,
+                          fontSize: 10,
+                          background: C.surfaceStrong,
+                          color: C.ink,
+                          padding: '3px 10px',
+                          borderRadius: 9999,
+                          fontWeight: 500,
                           flexShrink: 0,
+                          letterSpacing: '0.04em',
                         }}
                       >
-                        <span
-                          style={{
-                            fontSize: 9,
-                            background: `${C.gold}15`,
-                            color: C.gold,
-                            padding: '2px 8px',
-                            borderRadius: 4,
-                            fontWeight: 700,
-                          }}
-                        >
-                          {c.category}
-                        </span>
-                        <span style={{ fontSize: 11, color: C.textMuted }}>
-                          →
-                        </span>
-                      </div>
+                        {c.category}
+                      </span>
                     </div>
                     <p
                       style={{
-                        fontSize: 12,
-                        color: C.greenMid,
-                        fontWeight: 600,
-                        margin: '0 0 10px',
+                        fontSize: 13,
+                        color: C.body,
+                        fontWeight: 400,
+                        margin: '0 0 12px',
+                        letterSpacing: '0.01em',
                       }}
                     >
                       {c.organizer}
@@ -1892,18 +2010,18 @@ export default function ResultPage({ session, profile, pdfResult }) {
                         display: 'flex',
                         gap: 6,
                         flexWrap: 'wrap',
-                        marginBottom: c.tip ? 10 : 0,
+                        marginBottom: c.tip ? 12 : 0,
                       }}
                     >
                       {c.period && (
                         <span
                           style={{
-                            fontSize: 10,
-                            background: C.bg,
-                            color: C.textSub,
-                            padding: '2px 8px',
-                            borderRadius: 4,
-                            border: `1px solid ${C.border}`,
+                            fontSize: 11,
+                            background: C.surfaceStrong,
+                            color: C.ink,
+                            padding: '4px 10px',
+                            borderRadius: 9999,
+                            letterSpacing: '0.01em',
                           }}
                         >
                           {c.period}
@@ -1912,11 +2030,12 @@ export default function ResultPage({ session, profile, pdfResult }) {
                       {c.benefit && (
                         <span
                           style={{
-                            fontSize: 10,
-                            background: `${C.greenMid}10`,
-                            color: C.greenMid,
-                            padding: '2px 8px',
-                            borderRadius: 4,
+                            fontSize: 11,
+                            background: C.surfaceStrong,
+                            color: C.ink,
+                            padding: '4px 10px',
+                            borderRadius: 9999,
+                            letterSpacing: '0.01em',
                           }}
                         >
                           {c.benefit}
@@ -1926,26 +2045,25 @@ export default function ResultPage({ session, profile, pdfResult }) {
                     {c.tip && (
                       <p
                         style={{
-                          fontSize: 12,
-                          color: C.textSub,
+                          fontSize: 13,
+                          color: C.body,
                           margin: 0,
                           lineHeight: 1.65,
+                          letterSpacing: '0.01em',
                         }}
                       >
-                        💡 {c.tip}
+                        {c.tip}
                       </p>
                     )}
                   </div>
                 );
               })
             ) : (
-              <div
-                style={{ textAlign: 'center', padding: 48, color: C.textMuted }}
-              >
+              <div style={{ textAlign: 'center', padding: 56, color: C.muted }}>
                 <p>관련 공모전 정보가 없습니다</p>
               </div>
             )}
-            <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+            <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
               <a
                 href={`https://www.wevity.com/?c=find&s=${encodeURIComponent(majorKeyword)}`}
                 target="_blank"
@@ -1954,12 +2072,15 @@ export default function ResultPage({ session, profile, pdfResult }) {
                   flex: 1,
                   textAlign: 'center',
                   padding: '12px 0',
-                  borderRadius: 8,
-                  background: `${C.gold}15`,
-                  color: C.gold,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: '0.08em',
+                  height: 44,
+                  lineHeight: '20px',
+                  borderRadius: 9999,
+                  background: 'transparent',
+                  border: `1px solid ${C.hairlineStrong}`,
+                  color: C.ink,
+                  fontSize: 12,
+                  fontWeight: 500,
+                  letterSpacing: '0.01em',
                   textDecoration: 'none',
                 }}
               >
@@ -1973,12 +2094,15 @@ export default function ResultPage({ session, profile, pdfResult }) {
                   flex: 1,
                   textAlign: 'center',
                   padding: '12px 0',
-                  borderRadius: 8,
-                  background: `${C.greenMid}12`,
-                  color: C.greenMid,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: '0.08em',
+                  height: 44,
+                  lineHeight: '20px',
+                  borderRadius: 9999,
+                  background: 'transparent',
+                  border: `1px solid ${C.hairlineStrong}`,
+                  color: C.ink,
+                  fontSize: 12,
+                  fontWeight: 500,
+                  letterSpacing: '0.01em',
                   textDecoration: 'none',
                 }}
               >
@@ -1992,30 +2116,18 @@ export default function ResultPage({ session, profile, pdfResult }) {
   );
 }
 
-// ── 전환방법 카드 ─────────────────────────────────
+// ── 전환방법 카드 ──
 function TransferCard({ r, selected, onSelect }) {
-  const diffColor =
-    r.difficulty === '높음'
-      ? '#8B3A3A'
-      : r.difficulty === '보통'
-        ? '#B8975A'
-        : '#2D5A45';
-  const diffBg =
-    r.difficulty === '높음'
-      ? '#8B3A3A15'
-      : r.difficulty === '보통'
-        ? '#B8975A15'
-        : '#2D5A4515';
   return (
     <div
       onClick={onSelect}
       style={{
-        border: `1.5px solid ${selected ? C.green : C.border}`,
-        borderRadius: 10,
-        padding: '14px 18px',
+        border: `1px solid ${selected ? C.ink : C.hairline}`,
+        borderRadius: 12,
+        padding: '16px 20px',
         marginBottom: 10,
         cursor: 'pointer',
-        background: selected ? `${C.green}05` : C.surface,
+        background: selected ? C.canvasSoft : C.surface,
         transition: 'all 0.15s',
       }}
     >
@@ -2024,33 +2136,42 @@ function TransferCard({ r, selected, onSelect }) {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: 8,
+          marginBottom: 10,
         }}
       >
-        <span style={{ fontSize: 15, fontWeight: 700, color: C.text }}>
+        <span
+          style={{
+            fontSize: 16,
+            fontWeight: 500,
+            color: C.ink,
+            letterSpacing: '-0.01em',
+          }}
+        >
           {r.type}
         </span>
-        <div style={{ display: 'flex', gap: 6 }}>
+        <div style={{ display: 'flex', gap: 8 }}>
           <span
             style={{
-              fontSize: 10,
-              padding: '2px 8px',
-              borderRadius: 4,
-              background: C.bg,
-              color: C.textSub,
-              border: `1px solid ${C.border}`,
+              fontSize: 11,
+              padding: '3px 10px',
+              borderRadius: 9999,
+              background: C.surfaceStrong,
+              color: C.ink,
+              fontWeight: 500,
+              letterSpacing: '0.01em',
             }}
           >
             {r.duration}
           </span>
           <span
             style={{
-              fontSize: 10,
-              padding: '2px 8px',
-              borderRadius: 4,
-              background: diffBg,
-              color: diffColor,
-              fontWeight: 600,
+              fontSize: 11,
+              padding: '3px 10px',
+              borderRadius: 9999,
+              background: C.surfaceStrong,
+              color: C.ink,
+              fontWeight: 500,
+              letterSpacing: '0.01em',
             }}
           >
             {r.difficulty}
@@ -2059,24 +2180,25 @@ function TransferCard({ r, selected, onSelect }) {
       </div>
       <p
         style={{
-          fontSize: 13,
-          color: C.textSub,
-          margin: '0 0 10px',
-          lineHeight: 1.75,
+          fontSize: 14,
+          color: C.body,
+          margin: '0 0 12px',
+          lineHeight: 1.7,
+          letterSpacing: '0.01em',
         }}
       >
         {r.desc}
       </p>
       <span
         style={{
-          fontSize: 10,
-          color: selected ? C.green : C.textMuted,
-          fontWeight: 700,
-          letterSpacing: '0.08em',
+          fontSize: 11,
+          color: selected ? C.ink : C.muted,
+          fontWeight: 600,
+          letterSpacing: '0.12em',
           textTransform: 'uppercase',
         }}
       >
-        {selected ? '✓ 선택됨 — 로드맵 탭에서 확인' : '로드맵 보기 →'}
+        {selected ? '✓ 선택됨 — 로드맵 탭에서 확인' : '로드맵 보기'}
       </span>
     </div>
   );
