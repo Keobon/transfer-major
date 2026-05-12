@@ -39,40 +39,63 @@ function App() {
     if (data) setProfile(data);
   };
 
-  // ── 로딩 화면 (디자인 교체) ──────────────────────
+  // ── 로딩 화면 — ElevenLabs 에디토리얼 스타일 ──────
   if (loading)
     return (
       <div
         style={{
           minHeight: '100vh',
-          background: '#1A3A2F',
+          background: '#f5f5f5',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           flexDirection: 'column',
-          fontFamily: "'Pretendard','Apple SD Gothic Neo',sans-serif",
+          fontFamily:
+            "'Pretendard','Apple SD Gothic Neo','Noto Sans KR',sans-serif",
           position: 'relative',
           overflow: 'hidden',
         }}
       >
-        <style>{`@keyframes spin{to{transform:rotate(360deg)}} @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}`}</style>
-        {/* 배경 패턴 */}
+        <style>{`
+          @keyframes spin{to{transform:rotate(360deg)}}
+          @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+          @keyframes orbDrift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,-30px) scale(1.1)}}
+          @keyframes orbDrift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-30px,40px) scale(1.05)}}
+        `}</style>
+
+        {/* 파스텔 그라디언트 오브 — 라벤더 */}
         <div
           style={{
             position: 'absolute',
-            inset: 0,
-            backgroundImage: `repeating-conic-gradient(#2D5A4510 0% 25%, transparent 0% 50%)`,
-            backgroundSize: '32px 32px',
+            top: '15%',
+            left: '20%',
+            width: 360,
+            height: 360,
+            borderRadius: '50%',
+            background:
+              'radial-gradient(circle, #c8b8e0 0%, rgba(200,184,224,0) 70%)',
+            filter: 'blur(20px)',
+            animation: 'orbDrift1 8s ease-in-out infinite',
+            opacity: 0.7,
           }}
         />
+        {/* 파스텔 그라디언트 오브 — 피치 */}
         <div
           style={{
             position: 'absolute',
-            inset: 0,
-            backgroundImage: `radial-gradient(ellipse 70% 50% at 50% 100%, #2D5A45 0%, transparent 70%)`,
+            bottom: '20%',
+            right: '15%',
+            width: 320,
+            height: 320,
+            borderRadius: '50%',
+            background:
+              'radial-gradient(circle, #f4c5a8 0%, rgba(244,197,168,0) 70%)',
+            filter: 'blur(20px)',
+            animation: 'orbDrift2 9s ease-in-out infinite',
             opacity: 0.6,
           }}
         />
+
         <div
           style={{
             position: 'relative',
@@ -80,53 +103,39 @@ function App() {
             animation: 'fadeUp 0.5s ease',
           }}
         >
+          {/* 로고 — 디스플레이 300 */}
           <div
             style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              gap: 4,
-              justifyContent: 'center',
-              marginBottom: 32,
+              fontSize: 28,
+              fontWeight: 300,
+              color: '#0c0a09',
+              letterSpacing: '-0.04em',
+              marginBottom: 40,
             }}
           >
-            <span
-              style={{
-                fontSize: 24,
-                fontWeight: 800,
-                color: '#F5F2EC',
-                letterSpacing: '-0.02em',
-              }}
-            >
-              내일
-            </span>
-            <span
-              style={{
-                fontSize: 24,
-                fontWeight: 300,
-                color: '#B8975A',
-                letterSpacing: '0.12em',
-              }}
-            >
-              환승
-            </span>
+            내일<span style={{ fontWeight: 500 }}>환승</span>
           </div>
+
+          {/* 로딩 인디케이터 — 잉크 컬러 */}
           <div
             style={{
-              width: 36,
-              height: 36,
-              border: '2px solid #B8975A40',
-              borderTopColor: '#B8975A',
+              width: 32,
+              height: 32,
+              border: '1.5px solid #e7e5e4',
+              borderTopColor: '#0c0a09',
               borderRadius: '50%',
-              animation: 'spin 1.2s linear infinite',
-              margin: '0 auto 20px',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto 24px',
             }}
           />
+
           <p
             style={{
-              fontSize: 11,
-              color: '#F5F2EC70',
+              fontSize: 13,
+              color: '#777169',
               letterSpacing: '0.04em',
               margin: 0,
+              fontWeight: 400,
             }}
           >
             자신과 잘맞고 지속 가능한 일을 찾는 것

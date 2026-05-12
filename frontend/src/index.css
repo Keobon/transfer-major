@@ -1,28 +1,58 @@
-/* ── 내일환승 글로벌 스타일 — 머스타드 뮤트 테마 ── */
+/* ── 내일환승 글로벌 스타일 — ElevenLabs 에디토리얼 테마 ── */
 :root {
-  --bg: #f7f3e8;
-  --surface: #fefcf5;
-  --green: #2c4a3e;
-  --green-mid: #3d6b5a;
-  --mustard: #d4a837;
-  --mustard-lt: #e8b84b;
-  --mustard-bg: #fff8e1;
-  --gold: #c4973a;
-  --cream: #faf6ec;
-  --border: #e8dfc8;
-  --text: #1c1c1a;
-  --text-sub: #5a5548;
-  --text-muted: #9a9080;
+  /* ── 표면 ── */
+  --canvas: #f5f5f5;
+  --canvas-soft: #fafafa;
+  --canvas-deep: #0c0a09;
+  --surface-card: #ffffff;
+  --surface-strong: #f0efed;
+  --surface-dark: #0c0a09;
+  --surface-dark-elevated: #1c1917;
+
+  /* ── 잉크/텍스트 ── */
+  --ink: #0c0a09;
+  --primary: #292524;
+  --primary-active: #0c0a09;
+  --body: #4e4e4e;
+  --body-strong: #292524;
+  --muted: #777169;
+  --muted-soft: #a8a29e;
+  --on-primary: #ffffff;
+  --on-dark: #ffffff;
+  --on-dark-soft: #a8a29e;
+
+  /* ── 헤어라인 ── */
+  --hairline: #e7e5e4;
+  --hairline-soft: #f0efed;
+  --hairline-strong: #d6d3d1;
+
+  /* ── 파스텔 그라디언트 오브(시그니처) ── */
+  --gradient-mint: #a7e5d3;
+  --gradient-peach: #f4c5a8;
+  --gradient-lavender: #c8b8e0;
+  --gradient-sky: #a8c8e8;
+  --gradient-rose: #e8b8c4;
+
+  /* ── 시맨틱 ── */
+  --success: #16a34a;
+  --error: #dc2626;
+
+  /* ── 라운드 ── */
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+  --r-xxl: 24px;
+  --r-pill: 9999px;
 
   font:
-    16px/150% 'Pretendard',
+    16px/1.5 'Pretendard',
     'Apple SD Gothic Neo',
     'Noto Sans KR',
     system-ui,
     sans-serif;
   letter-spacing: 0.01em;
-  color: var(--text);
-  background: var(--bg);
+  color: var(--ink);
+  background: var(--canvas);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -36,7 +66,7 @@
 
 body {
   margin: 0;
-  background: var(--bg);
+  background: var(--canvas);
 }
 
 #root {
@@ -47,19 +77,21 @@ body {
   text-align: left;
 }
 
+/* ── 디스플레이 헤딩(Pretendard 300 — 에디토리얼) ── */
 h1,
 h2,
 h3,
 h4 {
-  font-weight: 700;
-  color: var(--text);
+  font-weight: 300;
+  color: var(--ink);
   margin: 0;
+  letter-spacing: -0.02em;
 }
 p {
   margin: 0;
 }
 a {
-  color: var(--green);
+  color: var(--ink);
   text-decoration: none;
 }
 button {
@@ -76,19 +108,19 @@ select {
   height: 4px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg);
+  background: var(--canvas);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
+  background: var(--hairline-strong);
   border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #d0c5a8;
+  background: var(--muted-soft);
 }
 
 ::selection {
-  background: #d4a83722;
-  color: var(--mustard);
+  background: var(--ink);
+  color: var(--on-dark);
 }
 
 .tab-scroll::-webkit-scrollbar {
@@ -97,4 +129,15 @@ select {
 .tab-scroll {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* ── 파스텔 그라디언트 오브(키프레임) ── */
+@keyframes orbDrift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(20px, -10px) scale(1.05);
+  }
 }
